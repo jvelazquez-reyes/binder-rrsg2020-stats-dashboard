@@ -1,5 +1,7 @@
 ##Call Python script from R##
-reticulate::use_python('python3', required = TRUE)
+
+#Disable prompt to install miniconda
+Sys.setenv(RETICULATE_MINICONDA_ENABLED = "FALSE")
 reticulate::source_python('nist.py')
 
 data <- read.csv("3T_NIST_T1maps_database.csv")
