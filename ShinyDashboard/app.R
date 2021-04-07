@@ -1,3 +1,14 @@
+library("Metrics")
+library("ggplot2")
+library("epiR")
+library("lme4")
+library("irr")
+library("sjPlot")
+library("plotly")
+library("shiny")
+library("shinythemes")
+library("shinydashboard")
+
 source("allStats.R")
 
 # Define UI for application that draws a histogram

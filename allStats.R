@@ -1,6 +1,6 @@
 ##Call Python script from R##
-use_python(path_to_python, required=T)
-source_python("nist.py")
+reticulate::use_python('python3', required = TRUE)
+reticulate::source_python('nist.py')
 
 data <- read.csv("3T_NIST_T1maps_database.csv")
 data[] <- gsub("[][]", "", as.matrix(data))
