@@ -82,6 +82,24 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                           tabsetPanel(sidebarLayout(
                               sidebarPanel(
                                   selectizeInput(
+                                      inputId = "FiltSitesID", 
+                                      label = "Select a group", 
+                                      choices = unique(MeasSites$dataSite$Site),
+                                      multiple = TRUE
+                                  ),
+                                  
+                              ),
+                              
+                              mainPanel(
+                                  h3("Data per Site/Scanner"),
+                                  plotlyOutput(outputId = "CompFiltSites")
+                              )
+                          )
+                          ),
+                          
+                          tabsetPanel(sidebarLayout(
+                              sidebarPanel(
+                                  selectizeInput(
                                       inputId = "SiteGermanyID", 
                                       label = "Select a group", 
                                       choices = unique(SiteGermany$dataSite$Site),
@@ -177,7 +195,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                               sidebarPanel(
                                   selectInput(inputId = "selectCompSite",
                                                 label = "Choose a site:",
-                                                choices = c("Montreal", "Germany"),
+                                                choices = c("Montreal","Germany","US","London","Australia"),
                                                 selected = "Montreal"),
                                   
                                   h2("Correlation coefficients"),
@@ -199,6 +217,24 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                  
                  #TAB 5
                  tabPanel("Standard Deviation",
+                          tabsetPanel(sidebarLayout(
+                              sidebarPanel(
+                                  selectizeInput(
+                                      inputId = "RefVSMeasID", 
+                                      label = "Select a group", 
+                                      choices = unique(RefVSMeas$stdData$sid),
+                                      multiple = TRUE
+                                  ),
+                                  
+                              ),
+                              
+                              mainPanel(
+                                  h3("Measurement per Site/Scanner"),
+                                  plotlyOutput(outputId = "sdFilteredSites")
+                              )
+                          )
+                          ),
+                          
                           tabsetPanel(sidebarLayout(
                               sidebarPanel(
                                   selectizeInput(
@@ -235,37 +271,37 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                           )
                           ),
                 
-                ),
+                )
                 
                 #TAB 6
-                tabPanel("LMEM",
-                         sidebarLayout(
-                             sidebarPanel(
-                                 selectizeInput(
-                                     inputId = "boxPlotSite", 
-                                     label = "Select a site", 
-                                     choices = unique(sitesLMEM$dataLME$sid),
-                                     #selected = "1.001",
-                                     multiple = FALSE
-                                 ),
-                                 
-                                 radioButtons(inputId = "diagnosticLME",
-                                              label = "LME Diagnostic",
-                                              choices = c("Linearity", "Normality of Residuals"),
-                                              selected = "Linearity"),
-                                 
-                                 helpText("Mathieu, B., et al. MathieuPaperName")
-                             ),
-                             
-                             mainPanel(
-                                 h3("Linear Mixed Effects Model"),
-                                 plotlyOutput(outputId = "boxPlotLME"),
-                                 h3("LME Model Summary"),
-                                 htmlOutput(outputId = "summaryLME"),
-                                 h3("Linear Mixed Effects Model Diagnostic"),
-                                 plotOutput(outputId = "diagLME")
-                             )
-                         ))
+                #tabPanel("LMEM",
+                #         sidebarLayout(
+                #             sidebarPanel(
+                #                 selectizeInput(
+                #                     inputId = "boxPlotSite", 
+                #                     label = "Select a site", 
+                #                     choices = unique(sitesLMEM$dataLME$sid),
+                #                     #selected = "1.001",
+                #                     multiple = FALSE
+                #                 ),
+                #                 
+                #                 radioButtons(inputId = "diagnosticLME",
+                #                              label = "LME Diagnostic",
+                #                              choices = c("Linearity", "Normality of Residuals"),
+                #                              selected = "Linearity"),
+                #                 
+                #                 helpText("Mathieu, B., et al. MathieuPaperName")
+                #             ),
+                #             
+                #             mainPanel(
+                #                 h3("Linear Mixed Effects Model"),
+                #                 plotlyOutput(outputId = "boxPlotLME"),
+                #                 h3("LME Model Summary"),
+                #                 htmlOutput(outputId = "summaryLME"),
+                #                 h3("Linear Mixed Effects Model Diagnostic"),
+                #                 plotOutput(outputId = "diagLME")
+                #             )
+                #         ))
     
 )
 
@@ -342,6 +378,20 @@ server <- function(input, output) {
     output$PearsonCorr <- renderTable(magVScomp$PearsonCorr)
     
     #TAB 3
+    sitesFiltered_colors <- setNames(rainbow(nrow(MeasSites$dataSite)), MeasSites$dataSite$ID_Site)
+    output$CompFiltSites <- renderPlotly({
+        plot_ly(MeasSites$dataSite, x = ~refT1, y = ~Mean, split = ~ID_Site, color = ~ID_Site, colors = sitesFiltered_colors) %>%
+            filter(Site %in% input$FiltSitesID) %>%
+            #group_by(sid) %>%
+            add_trace(type = 'scatter', mode = 'lines+markers',
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Site: ', Site,
+                                    '<br> Measured T1: ', signif(Mean,6),
+                                    '<br> Reference T1: ', signif(refT1,6),
+                                    '<br> Sphere: ', Sphere)) %>%
+            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"))
+    })
+    
     Germany_colors <- setNames(rainbow(nrow(SiteGermany$dataSite)), SiteGermany$dataSite$Site)
     output$CompGermany <- renderPlotly({
         plot_ly(SiteGermany$dataSite, x = ~refT1, y = ~Mean, split = ~Site, color = ~Site, colors = Germany_colors) %>%
@@ -419,6 +469,15 @@ server <- function(input, output) {
         }
         else if (input$selectCompSite == "Germany"){
             RefVSMeas = measuredT1_against_referenceT1(scans = Germany)
+        }
+        else if (input$selectCompSite == "US"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = US)
+        }
+        else if (input$selectCompSite == "London"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = London)
+        }
+        else if (input$selectCompSite == "Australia"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Australia)
         }
         
         p <- ggplot(data = RefVSMeas$BAData) +
@@ -516,6 +575,20 @@ server <- function(input, output) {
     #})
     
     #TAB 5
+    output$sdFilteredSites <- renderPlotly({
+        sdFiltered_colors <- setNames(rainbow(nrow(sdFilteredSites$stdData)), sdFilteredSites$stdData$ID_Site)
+        plot_ly(sdFilteredSites$stdData, x = ~reference, y = ~stdValues/reference, split = ~ID_Site, color = ~ID_Site, colors = sdFiltered_colors) %>%
+            filter(sid %in% input$RefVSMeasID) %>%
+            #group_by(sid) %>%
+            add_trace(type = 'scatter', mode = 'lines+markers',
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Site: ', sid,
+                                    '<br> SD: ', signif(stdValues,3),
+                                    '<br> Reference T1: ', signif(reference,6),
+                                    '<br> Sphere: ', sph)) %>%
+            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "SD/Reference T1"))
+    })
+    
     output$sdMontrealPlot <- renderPlotly({
         sdMontreal_colors <- setNames(rainbow(nrow(sdMontreal$stdData)), sdMontreal$stdData$sid)
         plot_ly(sdMontreal$stdData, x = ~reference, y = ~stdValues/reference, split = ~sid, color = ~sid, colors = sdMontreal_colors) %>%
@@ -545,42 +618,42 @@ server <- function(input, output) {
     })
 
     #TAB 6
-    output$boxPlotLME <- renderPlotly({
-        p <- ggplot(data = filter(sitesLMEM$dataLME, sid %in% input$boxPlotSite)) +
-            geom_boxplot(aes(x = sphere, y = dataSphere, fill = factor(sphere))) +
-            geom_jitter(aes(x = sphere, y = dataSphere, fill = factor(sphere),
-                        text = paste('<br> Measured Value: ', signif(dataSphere,6),
-                                     '<br> Reference Value: ', signif(t1ref,6),
-                                     '<br> Sphere: ', sphere)),
-                        position = position_nudge(x=0.4)) +
-            labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)", color = "Sphere") +
-            scale_x_reverse() +
-            scale_x_discrete(labels = c("14"="21.35","13"="30.32","12"="42.78","11"="60.06","10"="85.35",
-                                          "9"="120.89","8"="174.70","7"="240.71","6"="341.99","5"="485.90",
-                                          "4"="692.25","3"="994.84","2"="1342.53","1"="1911.16"))
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        ggplotly(p, tooltip = "text")
-    })
-    
-    firstLME <- lmer(dataSphere ~ t1ref + MRIversion + (1 + MRIversion|sid), data = sitesLMEM$dataLME)
-    
-    output$summaryLME <- renderUI({HTML(tab_model(firstLME, show.se = TRUE)$knitr)})
-    
-    output$diagLME <- renderPlot({
-        if (input$diagnosticLME == "Linearity"){
-            plot(fitted(firstLME),residuals(firstLME))
-        }
-        else if (input$diagnosticLME == "Normality of Residuals"){
-            hist(residuals(firstLME))
-        }
-    })
+    #output$boxPlotLME <- renderPlotly({
+    #    p <- ggplot(data = filter(sitesLMEM$dataLME, sid %in% input$boxPlotSite)) +
+    #        geom_boxplot(aes(x = sphere, y = dataSphere, fill = factor(sphere))) +
+    #        geom_jitter(aes(x = sphere, y = dataSphere, fill = factor(sphere),
+    #                    text = paste('<br> Measured Value: ', signif(dataSphere,6),
+    #                                 '<br> Reference Value: ', signif(t1ref,6),
+    #                                 '<br> Sphere: ', sphere)),
+    #                    position = position_nudge(x=0.4)) +
+    #        labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)", color = "Sphere") +
+    #        scale_x_reverse() +
+    #        scale_x_discrete(labels = c("14"="21.35","13"="30.32","12"="42.78","11"="60.06","10"="85.35",
+    #                                      "9"="120.89","8"="174.70","7"="240.71","6"="341.99","5"="485.90",
+    #                                      "4"="692.25","3"="994.84","2"="1342.53","1"="1911.16"))
+    #        theme(axis.line = element_line(colour = "black"), 
+    #              panel.grid.major = element_blank(), 
+    #              panel.grid.minor = element_blank(), 
+    #              panel.border = element_blank(), 
+    #              panel.background = element_blank()) +
+    #        theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    #                           axis.title = element_text(size = 12),
+    #                           axis.text = element_text(size = 12))
+    #    ggplotly(p, tooltip = "text")
+    #})
+    #
+    #firstLME <- lmer(dataSphere ~ t1ref + MRIversion + (1 + MRIversion|sid), data = sitesLMEM$dataLME)
+    #
+    #output$summaryLME <- renderUI({HTML(tab_model(firstLME, show.se = TRUE)$knitr)})
+    #
+    #output$diagLME <- renderPlot({
+    #    if (input$diagnosticLME == "Linearity"){
+    #        plot(fitted(firstLME),residuals(firstLME))
+    #    }
+    #    else if (input$diagnosticLME == "Normality of Residuals"){
+    #        hist(residuals(firstLME))
+    #    }
+    #})
     
     
 }

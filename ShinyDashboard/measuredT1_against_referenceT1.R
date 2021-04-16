@@ -5,7 +5,7 @@ measuredT1_against_referenceT1 <- function(scans){
   rmseSites <- data.frame()
   data4icc <- data.frame()
   correlations <- data.frame(Site=as.numeric(), R=as.numeric(), Lin=as.numeric())
-  correlations2 <- data.frame(R=as.numeric(), Lin=as.numeric(), ICC=as.numeric())
+  correlations2 <- data.frame(R=as.numeric(), Lin=as.numeric())
   
   firstSphere = whitelist$whitelists$`NIST spheres`$whitelist[1]
   lastSphere = tail(whitelist$whitelists$`NIST spheres`$whitelist,1)
@@ -32,7 +32,7 @@ measuredT1_against_referenceT1 <- function(scans){
     
     sid <- as.matrix(rep(as.character(scans[j]),lastSphere))
     sph <- as.matrix(firstSphere:lastSphere)
-    Group_Site <- as.matrix(rep(labelSidSite[j],lastSphere))
+    ID_Site <- as.matrix(rep(labelSidSite[j],lastSphere))
     
     #Bland-Altman analysis
     measValue <- meanSites[,j]
@@ -40,21 +40,27 @@ measuredT1_against_referenceT1 <- function(scans){
     difference <- measValue - reference
     average <- (measValue + reference)/2
     perc_difference <- difference*100/average
-    BA2plot <- data.frame(sid, Group_Site, sph, measValue, reference, difference, perc_difference, average)
+    BA2plot <- data.frame(sid, ID_Site, sph, measValue, reference, difference, perc_difference, average)
     
     #STD
     stdValues <- stdSites[,j]
-    std2plot <- data.frame(sid, Group_Site, sph, reference, stdValues)
+    std2plot <- data.frame(sid, ID_Site, sph, reference, stdValues)
     
     #RMSE
     rmseValues <- rmseSites[,j]
-    rmse2plot <- data.frame(sid, Group_Site, sph, reference, rmseValues)
+    rmse2plot <- data.frame(sid, ID_Site, sph, reference, rmseValues)
     
     #Long format data frame
     if (j==1){
       stdTmp = rbind(data.frame(), std2plot)
       rmseTmp = rbind(data.frame(), rmse2plot)
       BATmp = rbind(data.frame(), BA2plot)
+      
+      if (length(scans)==1){
+        stdData = stdTmp
+        rmseData = rmseTmp
+        BAData = BATmp
+      }
     }
     else{
       stdData = rbind(stdTmp, std2plot)
@@ -72,7 +78,7 @@ measuredT1_against_referenceT1 <- function(scans){
     #Lin's concordance correlation coefficient
     Lin_test = epi.ccc(data2coef[,1], data2coef[,2])
     
-    correlations[j,1] = id
+    correlations[j,1] = scans[j]
     correlations[j,2] = Pearson_test[1,2]
     correlations[j,3] = Lin_test[[1]][1]
   }
@@ -83,7 +89,7 @@ measuredT1_against_referenceT1 <- function(scans){
   Lin_test2 = epi.ccc(BAData$measValue, BAData$reference)
   correlations2[1,1] = Pearson_test2
   correlations2[1,2] = Lin_test2[[1]][1]
-  correlations2[1,3] = icc_test[7]
+  #correlations2[1,3] = icc_test[7]
   
   returnStats <- list("Correlation_coefficients" = correlations,
                      "BAData" = BAData,

@@ -29,9 +29,6 @@ cases <- c(1,seq(11,25,2),34,36)
 #p-value > 0.5, there's no statistical difference between magnitude and complex
 magVScomp <- comparison_magnitude_complex(cases,listSpheres)
 
-##ANALYSIS WITHIN GROUPS ACROSS SITES
-source("comparison_across_sites.R")
-
 #Germany <- 13:26
 #Montreal <- c(4,11,12,27:30,40)
 #US <- c(3,5:10,32:39)
@@ -43,12 +40,6 @@ US <- c(2.001,4.001,4.002,4.003,4.004,4.005,4.006,10.001,10.002,11.001,11.002,11
 Montreal <- c(3.001,5.001,5.002,7.001,7.002,8.001,8.002,13.001)
 Germany <- c(6.001,6.002,6.003,6.004,6.005,6.006,6.007,6.008,6.009,6.010,6.011,6.012,6.013,6.014)
 Australia <- c(9.001)
-
-SiteGermany <- comparison_across_sites(Germany)
-SiteMontreal <- comparison_across_sites(Montreal)
-SiteUS <- comparison_across_sites(US)
-SiteLondon <- comparison_across_sites(London)
-SiteAustralia <- comparison_across_sites(Australia)
 
 ##LOADING NIST_whitelists##
 whitelist <- fromJSON(file = "NIST_whitelists.json")
@@ -63,11 +54,22 @@ for (ii in seq(1,length(filteredSites))){
   if(filteredSites[ii] %in% Australia){labelSidSite[ii] = paste(filteredSites[ii],"Australia")}
 }
 
+##ANALYSIS WITHIN GROUPS ACROSS SITES
+source("comparison_across_sites.R")
+
+MeasSites <- comparison_across_sites(filteredSites)
+SiteGermany <- comparison_across_sites(Germany)
+SiteMontreal <- comparison_across_sites(Montreal)
+SiteUS <- comparison_across_sites(US)
+SiteLondon <- comparison_across_sites(London)
+SiteAustralia <- comparison_across_sites(Australia)
+
 ##COMPARISON BETWEEN MEASURED AND REFERENCE T1 VALUES##
 source("measuredT1_against_referenceT1.R")
 
-scans <- 1:4
-RefVSMeas <- measuredT1_against_referenceT1(scans)
+
+#scans <- 1:4
+sdFilteredSites <- measuredT1_against_referenceT1(filteredSites)
 sdMontreal <- measuredT1_against_referenceT1(Montreal)
 sdGermany <- measuredT1_against_referenceT1(Germany)
 
