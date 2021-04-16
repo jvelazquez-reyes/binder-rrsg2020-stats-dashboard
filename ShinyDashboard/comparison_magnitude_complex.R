@@ -14,8 +14,8 @@ comparison_magnitude_complex <- function(cases,listSpheres){
       meanComp[k,j] = mean(compData)
       
       ##DIFERENCE BETWEEN MAGNITUDE AND COMPLEX
-      diff_Mag_Comp[k,j] = mean(magData) - mean(compData)
-      diff_Perc_Mag_Comp[k,j] = 100*(mean(magData) - mean(compData))/(mean(magData) + mean(compData))/2
+      diff_Mag_Comp[k,j] = abs(mean(magData) - mean(compData))
+      diff_Perc_Mag_Comp[k,j] = 100*abs(mean(magData) - mean(compData))/(mean(magData) + mean(compData))/2
       
       ##STATISTICAL TESTS (COMPARE MEANS)
       #Test for normality of data

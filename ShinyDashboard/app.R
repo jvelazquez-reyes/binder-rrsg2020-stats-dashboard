@@ -1,6 +1,7 @@
 library("Metrics")
 library("ggplot2")
 library("epiR")
+library("rjson")
 library("lme4")
 library("irr")
 library("sjPlot")
@@ -38,7 +39,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                       inputId = "DiffSitesID", 
                                       label = "Select a site", 
                                       choices = unique(magVScomp$dataMagComp$sid),
-                                      #selected = "1.001",
+                                      selected = unique(magVScomp$dataMagComp$sid),
                                       multiple = TRUE
                                   ),
                                   
@@ -63,7 +64,6 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                               
                               mainPanel(
                                   h3("Difference between Magnitude and Complex"),
-                                  h5("Positive value: Magnitude > Complex. Negative value: Magnitude < Complex."),
                                   h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
                                   1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
                                      and 6.010 - Complex data."),
@@ -85,6 +85,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                       inputId = "FiltSitesID", 
                                       label = "Select a group", 
                                       choices = unique(MeasSites$dataSite$Site),
+                                      selected = unique(MeasSites$dataSite$Site),
                                       multiple = TRUE
                                   ),
                                   
@@ -96,97 +97,6 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                               )
                           )
                           ),
-                          
-                          tabsetPanel(sidebarLayout(
-                              sidebarPanel(
-                                  selectizeInput(
-                                      inputId = "SiteGermanyID", 
-                                      label = "Select a group", 
-                                      choices = unique(SiteGermany$dataSite$Site),
-                                      multiple = TRUE
-                                  ),
-                                  
-                              ),
-                              
-                              mainPanel(
-                                  h3("Germany Data"),
-                                  plotlyOutput(outputId = "CompGermany")
-                              )
-                          )
-                          ),
-                          
-                          tabsetPanel(sidebarLayout(
-                              sidebarPanel(
-                                  selectizeInput(
-                                      inputId = "SiteMontrealID", 
-                                      label = "Select a group", 
-                                      choices = unique(SiteMontreal$dataSite$Site),
-                                      multiple = TRUE
-                                  ),
-                                  
-                              ),
-                              
-                              mainPanel(
-                                  h3("Montreal Data"),
-                                  plotlyOutput(outputId = "CompMontreal")
-                              )
-                          )
-                          ),
-                          
-                          tabsetPanel(sidebarLayout(
-                              sidebarPanel(
-                                  selectizeInput(
-                                      inputId = "SiteUSID", 
-                                      label = "Select a group", 
-                                      choices = unique(SiteUS$dataSite$Site),
-                                      multiple = TRUE
-                                  ),
-                                  
-                              ),
-                              
-                              mainPanel(
-                                  h3("United States Data"),
-                                  plotlyOutput(outputId = "CompUS")
-                              )
-                          )
-                          ),
-                          
-                          tabsetPanel(sidebarLayout(
-                              sidebarPanel(
-                                  selectizeInput(
-                                      inputId = "SiteLondonID", 
-                                      label = "Select a group", 
-                                      choices = unique(SiteLondon$dataSite$Site),
-                                      multiple = TRUE
-                                  ),
-                                  
-                              ),
-                              
-                              mainPanel(
-                                  h3("London Data"),
-                                  plotlyOutput(outputId = "CompLondon")
-                              )
-                          )
-                          ),
-                          
-                          tabsetPanel(sidebarLayout(
-                              sidebarPanel(
-                                  selectizeInput(
-                                      inputId = "SiteAustraliaID", 
-                                      label = "Select a group", 
-                                      choices = unique(SiteAustralia$dataSite$Site),
-                                      multiple = TRUE
-                                  ),
-                                  
-                              ),
-                              
-                              mainPanel(
-                                  h3("Australia Data"),
-                                  plotlyOutput(outputId = "CompAustralia")
-                              )
-                          )
-                          )
-                          
                  ),
                  
                  #TAB 4
@@ -205,10 +115,10 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                               ),
                               
                               mainPanel(
-                                  h3("Bland-Altman plot"),
-                                  plotlyOutput(outputId = "BA4"),
                                   h3("Dispersion plot"),
-                                  plotlyOutput(outputId = "Disp4")
+                                  plotlyOutput(outputId = "Disp4"),
+                                  h3("Bland-Altman plot"),
+                                  plotlyOutput(outputId = "BA4")
                               )
                           ),
                           
@@ -223,6 +133,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                       inputId = "RefVSMeasID", 
                                       label = "Select a group", 
                                       choices = unique(RefVSMeas$stdData$sid),
+                                      selected = unique(RefVSMeas$stdData$sid),
                                       multiple = TRUE
                                   ),
                                   
@@ -233,44 +144,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                   plotlyOutput(outputId = "sdFilteredSites")
                               )
                           )
-                          ),
-                          
-                          tabsetPanel(sidebarLayout(
-                              sidebarPanel(
-                                  selectizeInput(
-                                      inputId = "sdMontrealID", 
-                                      label = "Select a group", 
-                                      choices = unique(sdMontreal$stdData$sid),
-                                      multiple = TRUE
-                                  ),
-                                  
-                              ),
-                              
-                              mainPanel(
-                                  h3("Montreal"),
-                                  plotlyOutput(outputId = "sdMontrealPlot")
-                              )
                           )
-                          ),
-                          
-                          tabsetPanel(sidebarLayout(
-                              sidebarPanel(
-                                  selectizeInput(
-                                      inputId = "sdGermanyID", 
-                                      label = "Select a group", 
-                                      choices = unique(sdGermany$stdData$sid),
-                                      multiple = TRUE
-                                  ),
-                                  
-                              ),
-                              
-                              mainPanel(
-                                  h3("Germany"),
-                                  plotlyOutput(outputId = "sdGermanyPlot")
-                              )
-                          )
-                          ),
-                
                 )
                 
                 #TAB 6
@@ -392,77 +266,45 @@ server <- function(input, output) {
             layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"))
     })
     
-    Germany_colors <- setNames(rainbow(nrow(SiteGermany$dataSite)), SiteGermany$dataSite$Site)
-    output$CompGermany <- renderPlotly({
-        plot_ly(SiteGermany$dataSite, x = ~refT1, y = ~Mean, split = ~Site, color = ~Site, colors = Germany_colors) %>%
-            filter(Site %in% input$SiteGermanyID) %>%
-            #group_by(sid) %>%
-            add_trace(type = 'scatter', mode = 'lines+markers',
-                      hoverinfo = 'text',
-                      text = ~paste('<br> Site: ', Site,
-                                    '<br> Measured T1: ', signif(Mean,6),
-                                    '<br> Reference T1: ', signif(refT1,6),
-                                    '<br> Sphere: ', Sphere)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"))
-    })
-    
-    Montreal_colors <- setNames(rainbow(nrow(SiteMontreal$dataSite)), SiteMontreal$dataSite$Site)
-    output$CompMontreal <- renderPlotly({
-        plot_ly(SiteMontreal$dataSite, x = ~refT1, y = ~Mean, split = ~Site, color = ~Site, colors = Montreal_colors) %>%
-            filter(Site %in% input$SiteMontrealID) %>%
-            #group_by(sid) %>%
-            add_trace(type = 'scatter', mode = 'lines+markers',
-                      hoverinfo = 'text',
-                      text = ~paste('<br> Site: ', Site,
-                                    '<br> Measured T1: ', signif(Mean,6),
-                                    '<br> Reference T1: ', signif(refT1,6),
-                                    '<br> Sphere: ', Sphere)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"))
-    })
-    
-    US_colors <- setNames(rainbow(nrow(SiteUS$dataSite)), SiteUS$dataSite$Site)
-    output$CompUS <- renderPlotly({
-        plot_ly(SiteUS$dataSite, x = ~refT1, y = ~Mean, split = ~Site, color = ~Site, colors = US_colors) %>%
-            filter(Site %in% input$SiteUSID) %>%
-            #group_by(sid) %>%
-            add_trace(type = 'scatter', mode = 'lines+markers',
-                      hoverinfo = 'text',
-                      text = ~paste('<br> Site: ', Site,
-                                    '<br> Measured T1: ', signif(Mean,6),
-                                    '<br> Reference T1: ', signif(refT1,6),
-                                    '<br> Sphere: ', Sphere)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"))
-    })
-    
-    London_colors <- setNames(rainbow(nrow(SiteLondon$dataSite)), SiteLondon$dataSite$Site)
-    output$CompLondon <- renderPlotly({
-        plot_ly(SiteLondon$dataSite, x = ~refT1, y = ~Mean, split = ~Site, color = ~Site, colors = London_colors) %>%
-            filter(Site %in% input$SiteLondonID) %>%
-            #group_by(sid) %>%
-            add_trace(type = 'scatter', mode = 'lines+markers',
-                      hoverinfo = 'text',
-                      text = ~paste('<br> Site: ', Site,
-                                    '<br> Measured T1: ', signif(Mean,6),
-                                    '<br> Reference T1: ', signif(refT1,6),
-                                    '<br> Sphere: ', Sphere)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"))
-    })
-    
-    Australia_colors <- setNames(rainbow(nrow(SiteAustralia$dataSite)), SiteAustralia$dataSite$Site)
-    output$CompAustralia <- renderPlotly({
-        plot_ly(SiteAustralia$dataSite, x = ~refT1, y = ~Mean, split = ~Site, color = ~Site, colors = Australia_colors) %>%
-            filter(Site %in% input$SiteAustraliaID) %>%
-            #group_by(sid) %>%
-            add_trace(type = 'scatter', mode = 'lines+markers',
-                      hoverinfo = 'text',
-                      text = ~paste('<br> Site: ', Site,
-                                    '<br> Measured T1: ', signif(Mean,6),
-                                    '<br> Reference T1: ', signif(refT1,6),
-                                    '<br> Sphere: ', Sphere)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"))
-    })
-    
     #TAB 4
+    output$Disp4 <- renderPlotly({
+        if (input$selectCompSite == "Montreal"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Montreal)
+        }
+        else if (input$selectCompSite == "Germany"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Germany)
+        }
+        else if (input$selectCompSite == "US"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = US)
+        }
+        else if (input$selectCompSite == "London"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = London)
+        }
+        else if (input$selectCompSite == "Australia"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Australia)
+        }
+ 
+        p <- ggplot(data = RefVSMeas$BAData) +
+            geom_point(aes(x = reference, y = measValue, fill = sid,
+                           text = paste('<br> Measured T1 Value: ', signif(measValue,6),
+                                        '<br> Reference T1 Value: ', signif(reference,6),
+                                        '<br> Sphere: ', sph)),
+                       color = "black", size = 1.5) +
+            labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
+            geom_smooth(aes(x = reference, y = measValue), method = "lm", formula = y~x,
+                        se = FALSE, color = "red", lwd = 0.5) +
+            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                               axis.title = element_text(size = 12),
+                               axis.text = element_text(size = 12))
+        ggplotly(p, tooltip = "text")
+    })
+    
     output$BA4 <- renderPlotly({
         if (input$selectCompSite == "Montreal"){
             RefVSMeas = measuredT1_against_referenceT1(scans = Montreal)
@@ -489,8 +331,8 @@ server <- function(input, output) {
                        pch = 1, size = 1.5, col = "black") +
             labs(x = "Average T1 (ms)", 
                  y = "Difference (%)") +
-            ylim(mean(RefVSMeas$BAData$perc_difference) - 4 * sd(RefVSMeas$BAData$perc_difference), 
-                 mean(RefVSMeas$BAData$perc_difference) + 4 * sd(RefVSMeas$BAData$perc_difference)) +
+            xlim(200,2150) +
+            ylim(-30, 30) +
             # Bias line
             geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference), lwd = 1) +
             # Line: y=0
@@ -504,43 +346,17 @@ server <- function(input, output) {
                        lty = 2, col = "firebrick") +
             theme(panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank()) +
-            geom_text(label = "Bias", x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 10, size = 3, 
+            geom_text(label = paste("Mean = ",signif(mean(RefVSMeas$BAData$perc_difference),3)), 
+                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 2, size = 3, 
                       colour = "black") +
-            geom_text(label = "+1.96SD", x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 
-                          1.96 * sd(RefVSMeas$BAData$perc_difference) + 10, size = 3, 
-                      colour = "firebrick") +
-            geom_text(label = "-1.96SD", x = 1800, y = mean(RefVSMeas$BAData$perc_difference) - 
-                          1.96 * sd(RefVSMeas$BAData$perc_difference) - 10, size = 3, 
-                      colour = "firebrick") +
-            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        ggplotly(p, tooltip = "text")
-    })
-    
-    output$Disp4 <- renderPlotly({
-        if (input$selectCompSite == "Montreal"){
-            RefVSMeas = measuredT1_against_referenceT1(scans = Montreal)
-        }
-        else if (input$selectCompSite == "Germany"){
-            RefVSMeas = measuredT1_against_referenceT1(scans = Germany)
-        }
- 
-        p <- ggplot(data = RefVSMeas$BAData) +
-            geom_point(aes(x = reference, y = measValue, fill = sid,
-                           text = paste('<br> Measured T1 Value: ', signif(measValue,6),
-                                        '<br> Reference T1 Value: ', signif(reference,6),
-                                        '<br> Sphere: ', sph)),
-                       color = "black", size = 1.5) +
-            labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
-            geom_smooth(aes(x = reference, y = measValue), method = "lm", formula = y~x,
-                        se = FALSE, color = "red", lwd = 0.5) +
-            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank()) +
+            geom_text(label = paste("Mean+1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)+1.96*sd(RefVSMeas$BAData$perc_difference),3)),
+                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 
+                          1.96*sd(RefVSMeas$BAData$perc_difference) + 2,
+                      size = 3, colour = "firebrick") +
+            geom_text(label = paste("Mean-1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)-1.96*sd(RefVSMeas$BAData$perc_difference),3)), 
+                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) - 
+                          1.96 * sd(RefVSMeas$BAData$perc_difference) - 2, 
+                      size = 3, colour = "firebrick") +
             theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                axis.title = element_text(size = 12),
                                axis.text = element_text(size = 12))
@@ -553,6 +369,15 @@ server <- function(input, output) {
         }
         else if (input$selectCompSite == "Germany"){
             RefVSMeas = measuredT1_against_referenceT1(scans = Germany)
+        }
+        else if (input$selectCompSite == "US"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = US)
+        }
+        else if (input$selectCompSite == "London"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = London)
+        }
+        else if (input$selectCompSite == "Australia"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Australia)
         }
         
         RefVSMeas$corr_coef_site
@@ -579,34 +404,6 @@ server <- function(input, output) {
         sdFiltered_colors <- setNames(rainbow(nrow(sdFilteredSites$stdData)), sdFilteredSites$stdData$ID_Site)
         plot_ly(sdFilteredSites$stdData, x = ~reference, y = ~stdValues/reference, split = ~ID_Site, color = ~ID_Site, colors = sdFiltered_colors) %>%
             filter(sid %in% input$RefVSMeasID) %>%
-            #group_by(sid) %>%
-            add_trace(type = 'scatter', mode = 'lines+markers',
-                      hoverinfo = 'text',
-                      text = ~paste('<br> Site: ', sid,
-                                    '<br> SD: ', signif(stdValues,3),
-                                    '<br> Reference T1: ', signif(reference,6),
-                                    '<br> Sphere: ', sph)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "SD/Reference T1"))
-    })
-    
-    output$sdMontrealPlot <- renderPlotly({
-        sdMontreal_colors <- setNames(rainbow(nrow(sdMontreal$stdData)), sdMontreal$stdData$sid)
-        plot_ly(sdMontreal$stdData, x = ~reference, y = ~stdValues/reference, split = ~sid, color = ~sid, colors = sdMontreal_colors) %>%
-            filter(sid %in% input$sdMontrealID) %>%
-            #group_by(sid) %>%
-            add_trace(type = 'scatter', mode = 'lines+markers',
-                      hoverinfo = 'text',
-                      text = ~paste('<br> Site: ', sid,
-                                    '<br> SD: ', signif(stdValues,3),
-                                    '<br> Reference T1: ', signif(reference,6),
-                                    '<br> Sphere: ', sph)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "SD/Reference T1"))
-    })
-    
-    output$sdGermanyPlot <- renderPlotly({
-        sdGermany_colors <- setNames(rainbow(nrow(sdGermany$stdData)), sdGermany$stdData$sid)
-        plot_ly(sdGermany$stdData, x = ~reference, y = ~stdValues/reference, split = ~sid, color = ~sid, colors = sdGermany_colors) %>%
-            filter(sid %in% input$sdGermanyID) %>%
             #group_by(sid) %>%
             add_trace(type = 'scatter', mode = 'lines+markers',
                       hoverinfo = 'text',
