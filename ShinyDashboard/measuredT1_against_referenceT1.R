@@ -6,10 +6,13 @@ measuredT1_against_referenceT1 <- function(scans){
   data4icc <- data.frame()
   correlations <- data.frame(Site=as.numeric(), R=as.numeric(), Lin=as.numeric())
   correlations2 <- data.frame(R=as.numeric(), Lin=as.numeric(), ICC=as.numeric())
+  
+  firstSphere = whitelist$whitelists$`NIST spheres`$whitelist[1]
+  lastSphere = tail(whitelist$whitelists$`NIST spheres`$whitelist,1)
   for (j in seq(1,length(scans))){
-    phantomTemperature = as.numeric(data[j,"phantom.temperature"])
-    phantomVersion = as.numeric(data[j,"phantom.version"])
-    id = data[scans[j],"id"]
+    rowIndex = match(scans[j],as.numeric(data[,"id"]))
+    phantomTemperature = as.numeric(data[rowIndex,"phantom.temperature"])
+    phantomVersion = as.numeric(data[rowIndex,"phantom.version"])
     
     if (phantomVersion<42){
       refT1 = temperature_correction(phantomTemperature,phantomVersion)
@@ -17,8 +20,8 @@ measuredT1_against_referenceT1 <- function(scans){
       refT1 = temperature_correction(phantomTemperature,phantomVersion)
     }
     
-    for (k in seq(1,14)){
-      measuredT1 = as.numeric(unlist(listSpheres[[scans[j]]][k]))
+    for (k in seq(firstSphere,lastSphere)){
+      measuredT1 = as.numeric(unlist(listSpheres[[rowIndex]][k]))
       meanSites[k,j] = mean(measuredT1)
       stdSites[k,j] = sd(measuredT1)
       rmseSites[k,j] = rmse(measuredT1, rep(refT1[k],length(measuredT1)))
@@ -27,24 +30,25 @@ measuredT1_against_referenceT1 <- function(scans){
       data4icc[k,j] = abs(meanSites[k,j] - refT1[k])*100/refT1[k]
     }
     
-    sid <- as.matrix(rep(id,14))
-    sph <- as.matrix(1:14)
+    sid <- as.matrix(rep(as.character(scans[j]),lastSphere))
+    sph <- as.matrix(firstSphere:lastSphere)
+    Group_Site <- as.matrix(rep(labelSidSite[j],lastSphere))
     
     #Bland-Altman analysis
     measValue <- meanSites[,j]
-    reference <- refT1
+    reference <- refT1[firstSphere:lastSphere]
     difference <- measValue - reference
     average <- (measValue + reference)/2
     perc_difference <- difference*100/average
-    BA2plot <- data.frame(sid, sph, measValue, reference, difference, perc_difference, average)
+    BA2plot <- data.frame(sid, Group_Site, sph, measValue, reference, difference, perc_difference, average)
     
     #STD
     stdValues <- stdSites[,j]
-    std2plot <- data.frame(sid, sph, refT1, stdValues)
+    std2plot <- data.frame(sid, Group_Site, sph, reference, stdValues)
     
     #RMSE
     rmseValues <- rmseSites[,j]
-    rmse2plot <- data.frame(sid, sph, refT1, rmseValues)
+    rmse2plot <- data.frame(sid, Group_Site, sph, reference, rmseValues)
     
     #Long format data frame
     if (j==1){

@@ -31,6 +31,9 @@ comparison_across_sites <- function(site){
     
     if (j==1){
       dataTmp = rbind(data.frame(), data_Site)
+      if (length(site)==1){
+        dataSite2plot = data_Site
+      }
     }
     else{
       dataSite2plot = rbind(dataTmp, data_Site)
@@ -40,26 +43,28 @@ comparison_across_sites <- function(site){
   
   ##ONE-WAY ANOVA##
   multComparisons <- list()
-  for (j in seq(1,14)){
-    flag = 1
-    anovaGer <- data.frame(T1=numeric(),group=numeric())
-    
-    for (k in site){
-      if (flag==1){
-        firstIndex = 0
-        lastIndex = 0
-      }
-      sample = as.numeric(unlist(listSpheres[[k]][j]))
-      lastIndex = length(sample)
-      anovaGer[(1+firstIndex):(firstIndex+lastIndex),1] = sample
-      anovaGer[(1+firstIndex):(firstIndex+lastIndex),2] = rep(as.numeric(data[k,"id"]),length(sample))
+  if (length(site)>2){
+    for (j in seq(1,14)){
+      flag = 1
+      anovaGer <- data.frame(T1=numeric(),group=numeric())
       
-      firstIndex = firstIndex + length(sample)
-      flag = 0
+      for (k in site){
+        if (flag==1){
+          firstIndex = 0
+          lastIndex = 0
+        }
+        sample = as.numeric(unlist(listSpheres[[k]][j]))
+        lastIndex = length(sample)
+        anovaGer[(1+firstIndex):(firstIndex+lastIndex),1] = sample
+        anovaGer[(1+firstIndex):(firstIndex+lastIndex),2] = rep(as.numeric(data[k,"id"]),length(sample))
+        
+        firstIndex = firstIndex + length(sample)
+        flag = 0
+      }
+      anovaGer$group <- as.factor(anovaGer$group)
+      res.aov <- aov(T1 ~ group, data = anovaGer)
+      multComparisons[j] = TukeyHSD(res.aov)
     }
-    anovaGer$group <- as.factor(anovaGer$group)
-    res.aov <- aov(T1 ~ group, data = anovaGer)
-    multComparisons[j] = TukeyHSD(res.aov)
   }
   
   colnames(dataSite2plot) <- c('Site', 'Sphere', 'refT1', 'Mean')
