@@ -40,33 +40,52 @@ magVScomp <- comparison_magnitude_complex(cases,listSpheres)
 whitelist <- fromJSON(file = "NIST_whitelists.json")
 
 ##FILTER PER SITE
-London <- c(1.001,1.002)
-US <- c(2.001,4.001,4.002,4.003,4.004,4.005,4.006,10.001,10.002,11.001,11.002,11.003,11.004,12.001,12.002)
-Montreal <- c(3.001,5.001,5.002,7.001,7.002,8.001,8.002,13.001)
-Germany <- c(6.001,6.002,6.003,6.004,6.005,6.006,6.007,6.008,6.009,6.010,6.011,6.012,6.013,6.014)
-Australia <- c(9.001)
+allLondon <- c(1.001,1.002)
+allUS <- c(2.001,4.001,4.002,4.003,4.004,4.005,4.006,10.001,10.002,11.001,11.002,11.003,11.004,12.001,12.002)
+allMontreal <- c(3.001,5.001,5.002,7.001,7.002,8.001,8.002,13.001)
+allGermany <- c(6.001,6.002,6.003,6.004,6.005,6.006,6.007,6.008,6.009,6.010,6.011,6.012,6.013,6.014)
+allAustralia <- c(9.001)
 
 filteredSites <- whitelist$whitelists$`one measurement per scanner`$whitelist
-labelSidSite <- matrix(0L, nrow = length(filteredSites), ncol = 1)
+
+London <- intersect(filteredSites,allLondon)
+US <- intersect(filteredSites,allUS)
+Montreal <- intersect(filteredSites,allMontreal)
+Germany <- intersect(filteredSites,allGermany)
+Australia <- intersect(filteredSites,allAustralia)
+
+labelSidSite <- matrix(0L, nrow = length(filteredSites), ncol = 2)
 for (ii in seq(1,length(filteredSites))){
-  if(filteredSites[ii] %in% London){labelSidSite[ii] = paste(filteredSites[ii],"London")}
-  if(filteredSites[ii] %in% US){labelSidSite[ii] = paste(filteredSites[ii],"US")}
-  if(filteredSites[ii] %in% Montreal){labelSidSite[ii] = paste(filteredSites[ii],"Montreal")}
-  if(filteredSites[ii] %in% Germany){labelSidSite[ii] = paste(filteredSites[ii],"Germany")}
-  if(filteredSites[ii] %in% Australia){labelSidSite[ii] = paste(filteredSites[ii],"Australia")}
+  if(filteredSites[ii] %in% London){labelSidSite[ii,1] = filteredSites[ii]
+  labelSidSite[ii,2] = paste(filteredSites[ii],"London")}
+  if(filteredSites[ii] %in% US){labelSidSite[ii,1] = filteredSites[ii]
+  labelSidSite[ii,2] = paste(filteredSites[ii],"US")}
+  if(filteredSites[ii] %in% Montreal){labelSidSite[ii,1] = filteredSites[ii]
+  labelSidSite[ii,2] = paste(filteredSites[ii],"Montreal")}
+  if(filteredSites[ii] %in% Germany){labelSidSite[ii,1] = filteredSites[ii]
+  labelSidSite[ii,2] = paste(filteredSites[ii],"Germany")}
+  if(filteredSites[ii] %in% Australia){labelSidSite[ii,1] = filteredSites[ii]
+  labelSidSite[ii,2] = paste(filteredSites[ii],"Australia")}
 }
 
 ##FILTER PER MRI VENDOR##
-Siemens <- c(1.001,1.002,2.001,3.001,8.001,8.002,9.001,10.001,10.002,12.001,12.002,13.001)
-GE <- c(4.001,4.002,4.003,4.004,4.005,4.006,11.001,11.002,11.003,11.004)
-Philips <- c(5.001,5.002,6.001,6.002,6.003,6.004,6.005,6.006,6.007,6.008,6.009,6.010,6.011,
+allSiemens <- c(1.001,1.002,2.001,3.001,8.001,8.002,9.001,10.001,10.002,12.001,12.002,13.001)
+allGE <- c(4.001,4.002,4.003,4.004,4.005,4.006,11.001,11.002,11.003,11.004)
+allPhilips <- c(5.001,5.002,6.001,6.002,6.003,6.004,6.005,6.006,6.007,6.008,6.009,6.010,6.011,
                 6.012,6.013,6.014,7.001,7.002)
 
-labelSidVendor <- matrix(0L, nrow = length(filteredSites), ncol = 1)
+Siemens <- intersect(filteredSites,allSiemens)
+GE <- intersect(filteredSites,allGE)
+Philips <- intersect(filteredSites,allPhilips)
+
+labelSidVendor <- matrix(0L, nrow = length(filteredSites), ncol = 2)
 for (ii in seq(1,length(filteredSites))){
-  if(filteredSites[ii] %in% Siemens){labelSidVendor[ii] = paste(filteredSites[ii],"Siemens")}
-  if(filteredSites[ii] %in% GE){labelSidVendor[ii] = paste(filteredSites[ii],"GE")}
-  if(filteredSites[ii] %in% Philips){labelSidVendor[ii] = paste(filteredSites[ii],"Philips")}
+  if(filteredSites[ii] %in% Siemens){labelSidVendor[ii,1] = filteredSites[ii]
+  labelSidVendor[ii,2] = paste(filteredSites[ii],"Siemens")}
+  if(filteredSites[ii] %in% GE){labelSidVendor[ii,1] = filteredSites[ii]
+  labelSidVendor[ii,2] = paste(filteredSites[ii],"GE")}
+  if(filteredSites[ii] %in% Philips){labelSidVendor[ii,1] = filteredSites[ii]
+  labelSidVendor[ii,2] = paste(filteredSites[ii],"Philips")}
 }
 
 ##ANALYSIS WITHIN GROUPS ACROSS SITES
@@ -81,7 +100,6 @@ SiteAustralia <- comparison_across_sites(Australia)
 
 ##COMPARISON BETWEEN MEASURED AND REFERENCE T1 VALUES##
 source("measuredT1_against_referenceT1.R")
-
 
 #scans <- 1:4
 RefVSMeas <- measuredT1_against_referenceT1(filteredSites)

@@ -108,18 +108,21 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                                          label = "Choose a site:",
                                                          choices = c("Montreal","Germany","US","London","Australia"),
                                                          selected = "Montreal"),
-                                             
-                                             h2("Correlation coefficients"),
-                                             tableOutput(outputId = "CorrCanGer"),
-                                             
-                                             
                                          ),
                                          
                                          mainPanel(
-                                             h3("Dispersion plot"),
-                                             plotlyOutput(outputId = "Disp4Site"),
                                              h3("Bland-Altman plot"),
                                              plotlyOutput(outputId = "BA4Site")
+                                         )
+                                     ),
+                                     sidebarLayout(
+                                         sidebarPanel(
+                                             h2("Correlation coefficients"),
+                                             tableOutput(outputId = "CorrSites")
+                                         ),
+                                         mainPanel(
+                                             h3("Dispersion plot"),
+                                             plotlyOutput(outputId = "Disp4Site")
                                          )
                                      )
                             ),
@@ -134,10 +137,18 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                          ),
                                          
                                          mainPanel(
-                                             h3("Dispersion plot"),
-                                             plotlyOutput(outputId = "Disp4Vendor"),
                                              h3("Bland-Altman plot"),
                                              plotlyOutput(outputId = "BA4Vendor")
+                                         )
+                                     ),
+                                     sidebarLayout(
+                                         sidebarPanel(
+                                             h2("Correlation coefficients"),
+                                             tableOutput(outputId = "CorrVendor")
+                                         ),
+                                         mainPanel(
+                                             h3("Dispersion plot"),
+                                             plotlyOutput(outputId = "Disp4Vendor")
                                          )
                                      )
                                      
@@ -307,7 +318,7 @@ server <- function(input, output) {
         }
  
         p <- ggplot(data = RefVSMeas$BAData) +
-            geom_point(aes(x = reference, y = measValue, fill = sid,
+            geom_point(aes(x = reference, y = measValue, fill = ID_Site,
                            text = paste('<br> Measured T1 Value: ', signif(measValue,6),
                                         '<br> Reference T1 Value: ', signif(reference,6),
                                         '<br> Sphere: ', sph)),
@@ -346,7 +357,7 @@ server <- function(input, output) {
         }
         
         p <- ggplot(data = RefVSMeas$BAData) +
-            geom_point(aes(x = average, y = perc_difference, fill = sid,
+            geom_point(aes(x = average, y = perc_difference, fill = ID_Site,
                            text = paste('<br> Difference (%): ', signif(perc_difference,4),
                                         '<br> Average T1: ', signif(average,5),
                                         '<BR> Reference T1: ', signif(reference,5),
@@ -355,7 +366,7 @@ server <- function(input, output) {
             labs(x = "Average T1 (ms)", 
                  y = "Difference (%)") +
             xlim(200,2150) +
-            ylim(-30, 30) +
+            ylim(-40, 40) +
             # Bias line
             geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference), lwd = 1) +
             # Line: y=0
@@ -387,7 +398,7 @@ server <- function(input, output) {
         ggplotly(p, tooltip = "text")
     })
     
-    output$CorrCanGer <- renderTable({
+    output$CorrSites <- renderTable({
         if (input$selectCompSite == "Montreal"){
             RefVSMeas = measuredT1_against_referenceT1(scans = Montreal)
         }
@@ -419,7 +430,7 @@ server <- function(input, output) {
         }
         
         p <- ggplot(data = RefVSMeas$BAData) +
-            geom_point(aes(x = reference, y = measValue, fill = sid,
+            geom_point(aes(x = reference, y = measValue, fill = ID_Vendor,
                            text = paste('<br> Measured T1 Value: ', signif(measValue,6),
                                         '<br> Reference T1 Value: ', signif(reference,6),
                                         '<br> Sphere: ', sph)),
@@ -452,7 +463,7 @@ server <- function(input, output) {
         }
         
         p <- ggplot(data = RefVSMeas$BAData) +
-            geom_point(aes(x = average, y = perc_difference, fill = sid,
+            geom_point(aes(x = average, y = perc_difference, fill = ID_Vendor,
                            text = paste('<br> Difference (%): ', signif(perc_difference,4),
                                         '<br> Average T1: ', signif(average,5),
                                         '<BR> Reference T1: ', signif(reference,5),
@@ -461,7 +472,7 @@ server <- function(input, output) {
             labs(x = "Average T1 (ms)", 
                  y = "Difference (%)") +
             xlim(200,2150) +
-            ylim(-30, 30) +
+            ylim(-35, 35) +
             # Bias line
             geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference), lwd = 1) +
             # Line: y=0
@@ -491,6 +502,20 @@ server <- function(input, output) {
                                axis.text = element_text(size = 12))
         p <- p + guides(fill=guide_legend(title="MRI Vendor"))
         ggplotly(p, tooltip = "text")
+    })
+    
+    output$CorrVendor <- renderTable({
+        if (input$selectCompSite == "Siemens"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Siemens)
+        }
+        else if (input$selectCompSite == "GE"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = GE)
+        }
+        else if (input$selectCompSite == "Philips"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Philips)
+        }
+        
+        RefVSMeas$corr_coef_site
     })
     
         #req(input$SitesID)

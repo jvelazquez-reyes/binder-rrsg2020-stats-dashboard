@@ -32,8 +32,14 @@ measuredT1_against_referenceT1 <- function(scans){
     
     sid <- as.matrix(rep(as.character(scans[j]),lastSphere))
     sph <- as.matrix(firstSphere:lastSphere)
-    ID_Site <- as.matrix(rep(labelSidSite[j],lastSphere))
-    ID_Vendor <- as.matrix(rep(labelSidVendor[j],lastSphere))
+    
+    dumIndSite = intersect(scans[j],labelSidSite[,1])
+    indFiltSite = match(dumIndSite,labelSidSite[,1])
+    ID_Site <- as.matrix(rep(labelSidSite[indFiltSite,2],lastSphere))
+    
+    dumIndVendor = intersect(scans[j],labelSidVendor[,1])
+    indFiltVendor = match(dumIndVendor,labelSidVendor[,1])
+    ID_Vendor <- as.matrix(rep(labelSidVendor[indFiltVendor,2],lastSphere))
     
     #Bland-Altman analysis
     measValue <- meanSites[,j]
