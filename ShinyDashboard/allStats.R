@@ -35,14 +35,16 @@ magVScomp <- comparison_magnitude_complex(cases,listSpheres)
 #London <- 1:2
 #Australia <- 31
 #id = data[scans[j],"id"]
+
+##LOADING NIST_whitelists##
+whitelist <- fromJSON(file = "NIST_whitelists.json")
+
+##FILTER PER SITE
 London <- c(1.001,1.002)
 US <- c(2.001,4.001,4.002,4.003,4.004,4.005,4.006,10.001,10.002,11.001,11.002,11.003,11.004,12.001,12.002)
 Montreal <- c(3.001,5.001,5.002,7.001,7.002,8.001,8.002,13.001)
 Germany <- c(6.001,6.002,6.003,6.004,6.005,6.006,6.007,6.008,6.009,6.010,6.011,6.012,6.013,6.014)
 Australia <- c(9.001)
-
-##LOADING NIST_whitelists##
-whitelist <- fromJSON(file = "NIST_whitelists.json")
 
 filteredSites <- whitelist$whitelists$`one measurement per scanner`$whitelist
 labelSidSite <- matrix(0L, nrow = length(filteredSites), ncol = 1)
@@ -52,6 +54,19 @@ for (ii in seq(1,length(filteredSites))){
   if(filteredSites[ii] %in% Montreal){labelSidSite[ii] = paste(filteredSites[ii],"Montreal")}
   if(filteredSites[ii] %in% Germany){labelSidSite[ii] = paste(filteredSites[ii],"Germany")}
   if(filteredSites[ii] %in% Australia){labelSidSite[ii] = paste(filteredSites[ii],"Australia")}
+}
+
+##FILTER PER MRI VENDOR##
+Siemens <- c(1.001,1.002,2.001,3.001,8.001,8.002,9.001,10.001,10.002,12.001,12.002,13.001)
+GE <- c(4.001,4.002,4.003,4.004,4.005,4.006,11.001,11.002,11.003,11.004)
+Philips <- c(5.001,5.002,6.001,6.002,6.003,6.004,6.005,6.006,6.007,6.008,6.009,6.010,6.011,
+                6.012,6.013,6.014,7.001,7.002)
+
+labelSidVendor <- matrix(0L, nrow = length(filteredSites), ncol = 1)
+for (ii in seq(1,length(filteredSites))){
+  if(filteredSites[ii] %in% Siemens){labelSidVendor[ii] = paste(filteredSites[ii],"Siemens")}
+  if(filteredSites[ii] %in% GE){labelSidVendor[ii] = paste(filteredSites[ii],"GE")}
+  if(filteredSites[ii] %in% Philips){labelSidVendor[ii] = paste(filteredSites[ii],"Philips")}
 }
 
 ##ANALYSIS WITHIN GROUPS ACROSS SITES
@@ -69,6 +84,7 @@ source("measuredT1_against_referenceT1.R")
 
 
 #scans <- 1:4
+RefVSMeas <- measuredT1_against_referenceT1(filteredSites)
 sdFilteredSites <- measuredT1_against_referenceT1(filteredSites)
 sdMontreal <- measuredT1_against_referenceT1(Montreal)
 sdGermany <- measuredT1_against_referenceT1(Germany)

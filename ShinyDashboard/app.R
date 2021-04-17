@@ -100,29 +100,48 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                  ),
                  
                  #TAB 4
-                 tabPanel("Comparison Montreal - Germany",
-                          sidebarLayout(
-                              sidebarPanel(
-                                  selectInput(inputId = "selectCompSite",
-                                                label = "Choose a site:",
-                                                choices = c("Montreal","Germany","US","London","Australia"),
-                                                selected = "Montreal"),
-                                  
-                                  h2("Correlation coefficients"),
-                                  tableOutput(outputId = "CorrCanGer"),
-                                  
-                                  
-                              ),
-                              
-                              mainPanel(
-                                  h3("Dispersion plot"),
-                                  plotlyOutput(outputId = "Disp4"),
-                                  h3("Bland-Altman plot"),
-                                  plotlyOutput(outputId = "BA4")
-                              )
-                          ),
-                          
-                          
+                 navbarMenu("Measured VS Reference T1",
+                            tabPanel("Site",
+                                     sidebarLayout(
+                                         sidebarPanel(
+                                             selectInput(inputId = "selectCompSite",
+                                                         label = "Choose a site:",
+                                                         choices = c("Montreal","Germany","US","London","Australia"),
+                                                         selected = "Montreal"),
+                                             
+                                             h2("Correlation coefficients"),
+                                             tableOutput(outputId = "CorrCanGer"),
+                                             
+                                             
+                                         ),
+                                         
+                                         mainPanel(
+                                             h3("Dispersion plot"),
+                                             plotlyOutput(outputId = "Disp4Site"),
+                                             h3("Bland-Altman plot"),
+                                             plotlyOutput(outputId = "BA4Site")
+                                         )
+                                     )
+                            ),
+                            
+                            tabPanel("MRI vendor",
+                                     sidebarLayout(
+                                         sidebarPanel(
+                                             selectInput(inputId = "selectCompVendor",
+                                                         label = "Choose an MRI Vendor:",
+                                                         choices = c("Siemens","GE","Philips"),
+                                                         selected = "Siemens")
+                                         ),
+                                         
+                                         mainPanel(
+                                             h3("Dispersion plot"),
+                                             plotlyOutput(outputId = "Disp4Vendor"),
+                                             h3("Bland-Altman plot"),
+                                             plotlyOutput(outputId = "BA4Vendor")
+                                         )
+                                     )
+                                     
+                            )
                  ),
                  
                  #TAB 5
@@ -211,7 +230,8 @@ server <- function(input, output) {
                           text = ~paste('<br> Site: ', sid,
                                         '<br> Difference: ', signif(diff,3),
                                         '<br> Sphere: ', sph)) %>%
-                layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "Absolute difference (ms)"))
+                layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "Absolute difference (ms)"),
+                       legend = list(title = list(text = "<b>Site ID</b>")))
         }
         else if (input$typeComparison == "Difference (%)"){
             plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~percDiff, split = ~sid, color = ~sid, colors = MagCom_colors) %>%
@@ -222,7 +242,8 @@ server <- function(input, output) {
                           text = ~paste('<br> Site: ', sid,
                                         '<br> Difference (%): ', signif(percDiff,4),
                                         '<br> Sphere: ', sph)) %>%
-                layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "Percentage difference (%)"))
+                layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "Percentage difference (%)"),
+                       legend = list(title = list(text = "<b>Site ID</b>")))
         }
     })
         
@@ -263,11 +284,12 @@ server <- function(input, output) {
                                     '<br> Measured T1: ', signif(Mean,6),
                                     '<br> Reference T1: ', signif(refT1,6),
                                     '<br> Sphere: ', Sphere)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"))
+            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"),
+                   legend = list(title = list(text = "<b>Site ID</b>")))
     })
     
     #TAB 4
-    output$Disp4 <- renderPlotly({
+    output$Disp4Site <- renderPlotly({
         if (input$selectCompSite == "Montreal"){
             RefVSMeas = measuredT1_against_referenceT1(scans = Montreal)
         }
@@ -302,10 +324,11 @@ server <- function(input, output) {
             theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                axis.title = element_text(size = 12),
                                axis.text = element_text(size = 12))
+        p <- p + guides(fill=guide_legend(title="Site ID"))
         ggplotly(p, tooltip = "text")
     })
     
-    output$BA4 <- renderPlotly({
+    output$BA4Site <- renderPlotly({
         if (input$selectCompSite == "Montreal"){
             RefVSMeas = measuredT1_against_referenceT1(scans = Montreal)
         }
@@ -360,6 +383,7 @@ server <- function(input, output) {
             theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                axis.title = element_text(size = 12),
                                axis.text = element_text(size = 12))
+        p <- p + guides(fill=guide_legend(title="Site ID"))
         ggplotly(p, tooltip = "text")
     })
     
@@ -381,6 +405,92 @@ server <- function(input, output) {
         }
         
         RefVSMeas$corr_coef_site
+    })
+    
+    output$Disp4Vendor <- renderPlotly({
+        if (input$selectCompVendor == "Siemens"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Siemens)
+        }
+        else if (input$selectCompVendor == "GE"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = GE)
+        }
+        else if (input$selectCompVendor == "Philips"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Philips)
+        }
+        
+        p <- ggplot(data = RefVSMeas$BAData) +
+            geom_point(aes(x = reference, y = measValue, fill = sid,
+                           text = paste('<br> Measured T1 Value: ', signif(measValue,6),
+                                        '<br> Reference T1 Value: ', signif(reference,6),
+                                        '<br> Sphere: ', sph)),
+                       color = "black", size = 1.5) +
+            labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
+            geom_smooth(aes(x = reference, y = measValue), method = "lm", formula = y~x,
+                        se = FALSE, color = "red", lwd = 0.5) +
+            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                               axis.title = element_text(size = 12),
+                               axis.text = element_text(size = 12))
+        p <- p + guides(fill=guide_legend(title="MRI Vendor"))
+        ggplotly(p, tooltip = "text")
+    })
+    
+    output$BA4Vendor <- renderPlotly({
+        if (input$selectCompVendor == "Siemens"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Siemens)
+        }
+        else if (input$selectCompVendor == "GE"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = GE)
+        }
+        else if (input$selectCompVendor == "Philips"){
+            RefVSMeas = measuredT1_against_referenceT1(scans = Philips)
+        }
+        
+        p <- ggplot(data = RefVSMeas$BAData) +
+            geom_point(aes(x = average, y = perc_difference, fill = sid,
+                           text = paste('<br> Difference (%): ', signif(perc_difference,4),
+                                        '<br> Average T1: ', signif(average,5),
+                                        '<BR> Reference T1: ', signif(reference,5),
+                                        '<br> Sphere: ', sph)), 
+                       pch = 1, size = 1.5, col = "black") +
+            labs(x = "Average T1 (ms)", 
+                 y = "Difference (%)") +
+            xlim(200,2150) +
+            ylim(-30, 30) +
+            # Bias line
+            geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference), lwd = 1) +
+            # Line: y=0
+            #geom_hline(yintercept = 0, lty = 3, col = "grey30") +
+            # Limits of Agreement
+            geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference) + 
+                           1.96 * sd(RefVSMeas$BAData$perc_difference), 
+                       lty = 2, col = "firebrick") +
+            geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference) - 
+                           1.96 * sd(RefVSMeas$BAData$perc_difference), 
+                       lty = 2, col = "firebrick") +
+            theme(panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank()) +
+            geom_text(label = paste("Mean = ",signif(mean(RefVSMeas$BAData$perc_difference),3)), 
+                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 2, size = 3, 
+                      colour = "black") +
+            geom_text(label = paste("Mean+1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)+1.96*sd(RefVSMeas$BAData$perc_difference),3)),
+                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 
+                          1.96*sd(RefVSMeas$BAData$perc_difference) + 2,
+                      size = 3, colour = "firebrick") +
+            geom_text(label = paste("Mean-1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)-1.96*sd(RefVSMeas$BAData$perc_difference),3)), 
+                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) - 
+                          1.96 * sd(RefVSMeas$BAData$perc_difference) - 2, 
+                      size = 3, colour = "firebrick") +
+            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                               axis.title = element_text(size = 12),
+                               axis.text = element_text(size = 12))
+        p <- p + guides(fill=guide_legend(title="MRI Vendor"))
+        ggplotly(p, tooltip = "text")
     })
     
         #req(input$SitesID)
@@ -411,7 +521,8 @@ server <- function(input, output) {
                                     '<br> SD: ', signif(stdValues,3),
                                     '<br> Reference T1: ', signif(reference,6),
                                     '<br> Sphere: ', sph)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "SD/Reference T1"))
+            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "SD/Reference T1"),
+                   legend = list(title = list(text = "<b>Site ID</b>")))
     })
 
     #TAB 6

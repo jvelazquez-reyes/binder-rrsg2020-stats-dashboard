@@ -33,6 +33,7 @@ measuredT1_against_referenceT1 <- function(scans){
     sid <- as.matrix(rep(as.character(scans[j]),lastSphere))
     sph <- as.matrix(firstSphere:lastSphere)
     ID_Site <- as.matrix(rep(labelSidSite[j],lastSphere))
+    ID_Vendor <- as.matrix(rep(labelSidVendor[j],lastSphere))
     
     #Bland-Altman analysis
     measValue <- meanSites[,j]
@@ -40,15 +41,15 @@ measuredT1_against_referenceT1 <- function(scans){
     difference <- measValue - reference
     average <- (measValue + reference)/2
     perc_difference <- difference*100/average
-    BA2plot <- data.frame(sid, ID_Site, sph, measValue, reference, difference, perc_difference, average)
+    BA2plot <- data.frame(sid, ID_Site, ID_Vendor, sph, measValue, reference, difference, perc_difference, average)
     
     #STD
     stdValues <- stdSites[,j]
-    std2plot <- data.frame(sid, ID_Site, sph, reference, stdValues)
+    std2plot <- data.frame(sid, ID_Site, ID_Vendor, sph, reference, stdValues)
     
     #RMSE
     rmseValues <- rmseSites[,j]
-    rmse2plot <- data.frame(sid, ID_Site, sph, reference, rmseValues)
+    rmse2plot <- data.frame(sid, ID_Site, ID_Vendor, sph, reference, rmseValues)
     
     #Long format data frame
     if (j==1){
@@ -93,11 +94,11 @@ measuredT1_against_referenceT1 <- function(scans){
   colnames(correlations2) = c("R","Lin's Concordance")
   
   returnStats <- list("Correlation_coefficients" = correlations,
-                     "BAData" = BAData,
-                     "stdData" = stdData,
-                     "rmseData" = rmseData,
-                     "corr_coef_site" = correlations2,
-                     "test" = data4icc)
+                      "BAData" = BAData,
+                      "stdData" = stdData,
+                      "rmseData" = rmseData,
+                      "corr_coef_site" = correlations2,
+                      "test" = data4icc)
   return(returnStats)
   
 }
