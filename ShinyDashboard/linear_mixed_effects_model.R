@@ -9,11 +9,7 @@ linear_mixed_effects_model <- function(sites){
   for (i in sites){
     phantomTemperature = as.numeric(data[i,"phantom.temperature"])
     phantomVersion = as.numeric(data[i,"phantom.version"])
-    if (phantomVersion<42){
-      refT1 = temperature_correction(phantomTemperature,phantomVersion)
-    } else {
-      refT1 = temperature_correction(phantomTemperature,phantomVersion)
-    }
+    refT1 = temperature_correction(phantomTemperature,phantomVersion)
     
     id = data[i,"id"]
     dType = data[i,"Data.type"]

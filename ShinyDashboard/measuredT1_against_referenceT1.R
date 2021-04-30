@@ -13,12 +13,7 @@ measuredT1_against_referenceT1 <- function(scans){
     rowIndex = match(scans[j],as.numeric(data[,"id"]))
     phantomTemperature = as.numeric(data[rowIndex,"phantom.temperature"])
     phantomVersion = as.numeric(data[rowIndex,"phantom.version"])
-    
-    if (phantomVersion<42){
-      refT1 = temperature_correction(phantomTemperature,phantomVersion)
-    } else {
-      refT1 = temperature_correction(phantomTemperature,phantomVersion)
-    }
+    refT1 = temperature_correction(phantomTemperature,phantomVersion)
     
     for (k in seq(firstSphere,lastSphere)){
       measuredT1 = as.numeric(unlist(listSpheres[[rowIndex]][k]))

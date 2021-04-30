@@ -38,11 +38,7 @@ comparison_magnitude_complex <- function(cases,listSpheres){
     
     phantomTemperature = as.numeric(data[j,"phantom.temperature"])
     phantomVersion = as.numeric(data[j,"phantom.version"])
-    if (phantomVersion<42){
-      refT1 = temperature_correction(phantomTemperature,phantomVersion)
-    } else {
-      refT1 = temperature_correction(phantomTemperature,phantomVersion)
-    }
+    refT1 = temperature_correction(phantomTemperature,phantomVersion)
     
     id = data[cases[j],"id"]
     sid <- as.matrix(rep(id,14))
