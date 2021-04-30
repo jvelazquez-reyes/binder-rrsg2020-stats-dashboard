@@ -1,33 +1,54 @@
 comparison_across_sites <- function(site){
   meanSite = data.frame()
+  spheres = whitelist$whitelists$`NIST spheres`$whitelist
   for (j in seq(1,length(site))){
-    for (k in seq(1,14)){
+    flag=1
+    numSpheres = 1
+    id = site[j]
+    #Find SID_Site
+    dumIndSite = intersect(site[j],labelSidSite[,1])
+    indFiltSite = match(dumIndSite,labelSidSite[,1])
+    for (k in spheres){
       rowIndex = match(site[j],as.numeric(data[,"id"]))
       siteData = as.numeric(unlist(listSpheres[[rowIndex]][k]))
       
       phantomTemperature = as.numeric(data[rowIndex,"phantom.temperature"])
       phantomVersion = as.numeric(data[rowIndex,"phantom.version"])
-      if (phantomVersion<42){
-        refT1 = temperature_correction(phantomTemperature,phantomVersion)
-      } else {
-        refT1 = temperature_correction(phantomTemperature,phantomVersion)
+      refT1 = temperature_correction(phantomTemperature,phantomVersion)
+      
+      #For entire slice
+      meanSite[numSpheres,j] = mean(siteData)
+      
+      #Pixelwise
+      sid_long <- as.matrix(rep(id,length(siteData)))
+      ID_Site_long <- as.matrix(rep(labelSidSite[indFiltSite,2],length(siteData)))
+      sph_long <- as.matrix(rep(k,length(siteData)))
+      t1_long <- as.matrix(rep(refT1[c(spheres)][numSpheres],length(siteData)))
+      
+      data_Site_long <- data.frame(sid_long, ID_Site_long, sph_long, t1_long, siteData)
+      
+      if (j==1 && flag==1){
+        dataTmp_long = rbind(data.frame(), data_Site_long)
+        flag=0
+        if (length(site)==1){
+          dataSite2plot_long = data_Site_long
+        }
+      }
+      else{
+        dataSite2plot_long = rbind(dataTmp_long,data_Site_long)
+        dataTmp_long <- dataSite2plot_long
       }
       
-      meanSite[k,j] = mean(siteData)
-      
-      ##DIFERENCE BETWEEN MAGNITUDE AND COMPLEX
-      #diff_Mag_Comp[k,j] = mean(magData) - mean(compData)
-      #diff_Perc_Mag_Comp[k,j] = 100*abs(mean(magData) - mean(compData))/mean(magData)
-      
       ##STATISTICAL TESTS (COMPARE MEANS)
-      
+      #subset(RefVSMeas$BAData, sph == 1)
+      numSpheres = numSpheres + 1
     }
     
-    id = site[j]
-    sid <- as.matrix(rep(id,14))
-    sph <- as.matrix(1:14)
-    t1 <- as.matrix(refT1)
-    ID_Site <- as.matrix(rep(labelSidSite[j],14))
+    #Entire slice
+    sid <- as.matrix(rep(id,length(spheres)))
+    sph <- as.matrix(c(spheres))
+    t1 <- as.matrix(refT1[c(spheres)])
+    ID_Site <- as.matrix(rep(labelSidSite[indFiltSite,2],length(spheres)))
     
     data_Site <- data.frame(sid, ID_Site, sph, t1, meanSite[,j])
     
@@ -73,6 +94,7 @@ comparison_across_sites <- function(site){
   colnames(dataSite2plot) <- c('Site', 'ID_Site', 'Sphere', 'refT1', 'Mean')
   
   returnComparison <- list("dataSite" = dataSite2plot,
+                           "dataSite_long" = dataSite2plot_long,
                            "ANOVA" = multComparisons)
   
   return(returnComparison)
