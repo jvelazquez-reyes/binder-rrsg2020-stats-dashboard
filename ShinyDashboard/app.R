@@ -64,14 +64,14 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                               
                               mainPanel(
                                   h3("Difference between Magnitude and Complex"),
-                                  h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
-                                  1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
-                                     and 6.010 - Complex data."),
+                                  #h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
+                                  #1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
+                                  #   and 6.010 - Complex data."),
                                   plotlyOutput(outputId = "MagComp"),
                                   h3("Correlation between Magnitude and Complex"),
-                                  h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
-                                  1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
-                                     and 6.010 - Complex data."),
+                                  #h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
+                                  #1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
+                                  #   and 6.010 - Complex data."),
                                   plotlyOutput(outputId = "CorrMagComp")
                               )
                           )
@@ -97,6 +97,38 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                               )
                           )
                           ),
+                          
+                          tabsetPanel(sidebarLayout(
+                              sidebarPanel(
+                                  selectInput(inputId = "DispAllSite",
+                                              label = "Choose a site:",
+                                              choices = c("Montreal","Germany","US","London","Australia"),
+                                              selected = "Montreal")
+                                  
+                              ),
+                              
+                              mainPanel(
+                                  h3("Dispersion plot, pixelwise"),
+                                  plotlyOutput(outputId = "DispAllPoints")
+                              )
+                          )
+                          ),
+                          
+                          tabsetPanel(sidebarLayout(
+                              sidebarPanel(
+                                  selectInput(inputId = "AcErrorAllSite",
+                                              label = "Choose a site:",
+                                              choices = c("Montreal","Germany","US","London","Australia"),
+                                              selected = "Montreal")
+                                  
+                              ),
+                              
+                              mainPanel(
+                                  h3("Accuracy Error"),
+                                  plotlyOutput(outputId = "AcErrorAllPoints")
+                              )
+                          )
+                          )
                  ),
                  
                  #TAB 4
@@ -107,7 +139,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                              selectInput(inputId = "selectCompSite",
                                                          label = "Choose a site:",
                                                          choices = c("Montreal","Germany","US","London","Australia"),
-                                                         selected = "Montreal"),
+                                                         selected = "Montreal")
                                          ),
                                          
                                          mainPanel(
@@ -298,6 +330,83 @@ server <- function(input, output) {
             layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"),
                    legend = list(title = list(text = "<b>Site ID</b>")))
     })
+    
+    output$DispAllPoints <- renderPlotly({
+        if (input$DispAllSite == "Montreal"){
+            DispersionAllPoints = SiteMontreal
+        }
+        else if (input$DispAllSite == "Germany"){
+            DispersionAllPoints = SiteGermany
+        }
+        else if (input$DispAllSite == "US"){
+            DispersionAllPoints = SiteUS
+        }
+        else if (input$DispAllSite == "London"){
+            DispersionAllPoints = SiteLondon
+        }
+        else if (input$DispAllSite == "Australia"){
+            DispersionAllPoints = SiteAustralia
+        }
+        
+        p <- ggplot(data = DispersionAllPoints$dataSite_long) +
+            geom_point(aes(x = t1_long, y = siteData, fill = ID_Site_long,
+                           text = paste('<br> Measured T1 Value: ', signif(siteData,6),
+                                        '<br> Reference T1 Value: ', signif(t1_long,6),
+                                        '<br> Sphere: ', sph_long)),
+                       color = "black", size = 1.5) +
+            labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
+            geom_smooth(aes(x = t1_long, y = siteData), method = "lm", formula = y~x,
+                        se = FALSE, color = "red", lwd = 0.5) +
+            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                               axis.title = element_text(size = 12),
+                               axis.text = element_text(size = 12))
+        p <- p + guides(fill=guide_legend(title="Site ID"))
+        ggplotly(p, tooltip = "text")
+    })
+    
+    output$AcErrorAllPoints <- renderPlotly({
+        if (input$AcErrorAllSite == "Montreal"){
+            AcErrorAllPoints = SiteMontreal
+        }
+        else if (input$AcErrorAllSite == "Germany"){
+            AcErrorAllPoints = SiteGermany
+        }
+        else if (input$AcErrorAllSite == "US"){
+            AcErrorAllPoints = SiteUS
+        }
+        else if (input$AcErrorAllSite == "London"){
+            AcErrorAllPoints = SiteLondon
+        }
+        else if (input$AcErrorAllSite == "Australia"){
+            AcErrorAllPoints = SiteAustralia
+        }
+        
+        p <- ggplot(data = AcErrorAllPoints$dataSite_long) +
+            geom_point(aes(x = t1_long, y = ac_error, fill = ID_Site_long,
+                           text = paste('<br> Accuracy Error: ', signif(ac_error,3),
+                                        '<br> Reference T1 Value: ', signif(t1_long,6),
+                                        '<br> Sphere: ', sph_long)),
+                       color = "black", size = 1.5) +
+            labs(x = "Reference T1 value (ms)", y = "Accuracy Error (%)") +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                               axis.title = element_text(size = 12),
+                               axis.text = element_text(size = 12))
+        p <- p + guides(fill=guide_legend(title="Site ID"))
+        ggplotly(p, tooltip = "text")
+    })
+    
+    
     
     #TAB 4
     output$Disp4Site <- renderPlotly({
