@@ -119,7 +119,11 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                   selectInput(inputId = "AcErrorAllSite",
                                               label = "Choose a site:",
                                               choices = c("Montreal","Germany","US","London","Australia"),
-                                              selected = "Montreal")
+                                              selected = "Montreal"),
+                                  sliderInput(inputId = "errorThr",
+                                              label = "Accuracy error range",
+                                              min = 0, max = 50,
+                                              value = c(0,50), step = 1)
                                   
                               ),
                               
@@ -387,7 +391,9 @@ server <- function(input, output) {
             AcErrorAllPoints = SiteAustralia
         }
         
-        p <- ggplot(data = AcErrorAllPoints$dataSite_long) +
+        AcErrorAllPoints = subset(AcErrorAllPoints$dataSite_long, ac_error <= input$errorThr[2])
+        
+        p <- ggplot(data = AcErrorAllPoints) +
             geom_point(aes(x = t1_long, y = ac_error, fill = ID_Site_long,
                            text = paste('<br> Accuracy Error: ', signif(ac_error,3),
                                         '<br> Reference T1 Value: ', signif(t1_long,6),
