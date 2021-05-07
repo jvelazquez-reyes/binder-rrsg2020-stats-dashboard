@@ -1,6 +1,7 @@
 comparison_across_sites <- function(site){
   meanSite = data.frame()
   matSpheres = matrix(0)
+  corr_per_sphere <- data.frame(Sphere=as.integer(), R=as.numeric())
   #spheres = whitelist$whitelists$`NIST spheres`$whitelist
   spheres = 1:14
   for (j in seq(1,length(site))){
@@ -66,9 +67,13 @@ comparison_across_sites <- function(site){
       dataSite2plot = rbind(dataTmp, data_Site)
       dataTmp <- dataSite2plot
     }
-    
-    #Correlation coefficients per sphere, pixelwise
-    
+  }
+  
+  #Correlation coefficients per sphere, pixelwise
+  for (ii in seq(1,length(spheres))){
+    data_per_sphere = subset(dataSite2plot_long, sph_long == spheres[ii])
+    corr_per_sphere[ii,1] = spheres[ii]
+    corr_per_sphere[ii,2] = cor(data_per_sphere$t1_long,data_per_sphere$siteData)
   }
   
   ##ONE-WAY ANOVA##
@@ -102,6 +107,7 @@ comparison_across_sites <- function(site){
   
   returnComparison <- list("dataSite" = dataSite2plot,
                            "dataSite_long" = dataSite2plot_long,
+                           "corrSph_across_sites" = corr_per_sphere,
                            "ANOVA" = multComparisons)
   
   return(returnComparison)

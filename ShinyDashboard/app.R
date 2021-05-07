@@ -58,7 +58,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                   ),
                                   
                                   h2("Correlation coefficients"),
-                                  tableOutput(outputId = "PearsonCorr"),
+                                  tableOutput(outputId = "PearsonCorr")
                                   
                               ),
                               
@@ -103,8 +103,10 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                   selectInput(inputId = "DispAllSite",
                                               label = "Choose a site:",
                                               choices = c("Montreal","Germany","US","London","Australia"),
-                                              selected = "Montreal")
+                                              selected = "Montreal"),
                                   
+                                  h2("Correlation coefficients per sphere"),
+                                  tableOutput(outputId = "CorrSphSites")
                               ),
                               
                               mainPanel(
@@ -412,8 +414,26 @@ server <- function(input, output) {
         ggplotly(p, tooltip = "text")
     })
     
-    
-    
+    output$CorrSphSites <- renderTable({
+        if (input$DispAllSite == "Montreal"){
+            CorrTableSites = SiteMontreal
+        }
+        else if (input$DispAllSite == "Germany"){
+            CorrTableSites = SiteGermany
+        }
+        else if (input$DispAllSite == "US"){
+            CorrTableSites = SiteUS
+        }
+        else if (input$DispAllSite == "London"){
+            CorrTableSites = SiteLondon
+        }
+        else if (input$DispAllSite == "Australia"){
+            CorrTableSites = SiteAustralia
+        }
+        
+        CorrTableSites$corrSph_across_sites
+    })
+
     #TAB 4
     output$Disp4Site <- renderPlotly({
         if (input$selectCompSite == "Montreal"){
