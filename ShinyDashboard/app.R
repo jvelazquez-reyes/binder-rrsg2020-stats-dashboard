@@ -47,8 +47,20 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                                label = "Choose the type of plot to display",
                                                choices = c("Difference", "Difference (%)"),
                                                selected = "Difference (%)"
-                                  ),
-                                  
+                                  )
+                              ),
+                              
+                              mainPanel(
+                                  h3("Difference between Magnitude and Complex"),
+                                  #h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
+                                  #1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
+                                  #   and 6.010 - Complex data."),
+                                  plotlyOutput(outputId = "MagComp"),
+                              )
+                          ),
+                          
+                          sidebarLayout(
+                              sidebarPanel(
                                   selectizeInput(
                                       inputId = "CorrSitesID", 
                                       label = "Select a site to show a dispersion plot", 
@@ -58,16 +70,13 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                   ),
                                   
                                   h2("Correlation coefficients"),
-                                  tableOutput(outputId = "PearsonCorr")
-                                  
+                                  h1("Complete phantom"),
+                                  tableOutput(outputId = "PearsonCorr"),
+                                  h1("Per Sphere"),
+                                  tableOutput(outputId = "PearsonMagCompPerSphere")
                               ),
                               
                               mainPanel(
-                                  h3("Difference between Magnitude and Complex"),
-                                  #h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
-                                  #1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
-                                  #   and 6.010 - Complex data."),
-                                  plotlyOutput(outputId = "MagComp"),
                                   h3("Correlation between Magnitude and Complex"),
                                   #h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
                                   #1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
@@ -320,6 +329,22 @@ server <- function(input, output) {
     })
     
     output$PearsonCorr <- renderTable(magVScomp$PearsonCorr)
+    
+    spheres = 1:14
+    #corr_per_sphere = reactiveValues(df = data.frame(Sphere=as.integer(), R=as.numeric()))
+    corr_per_sphere <- data.frame(Sphere=as.integer(), R=as.numeric())
+    dataMagCompSphere = comparison_magnitude_complex(cases, listSpheres)
+    #corr_per_sphere$df <- data.frame(Sphere=as.integer(), R=as.numeric())
+    my_data <- reactive({
+        for (ii in seq(1,length(spheres))){
+            
+            data_per_sphere = subset(dataMagCompSphere$PearsonCorrSphere, sid_long == input$CorrSitesID[1] & sph_long == spheres[ii])
+            corr_per_sphere$df[ii,1] = spheres[ii]
+            corr_per_sphere$df[ii,2] = cor(data_per_sphere$magData,data_per_sphere$compData)
+        }
+        
+    })
+    output$PearsonMagCompPerSphere <- renderTable(my_data())
     
     #TAB 3
     sitesFiltered_colors <- setNames(rainbow(nrow(MeasSites$dataSite)), MeasSites$dataSite$ID_Site)

@@ -4,16 +4,40 @@ comparison_magnitude_complex <- function(cases,listSpheres){
   meanComp = data.frame()
   diff_Mag_Comp <- data.frame()
   diff_Perc_Mag_Comp <- data.frame()
+  corr_per_sphere <- data.frame(Sphere=as.integer(), R=as.numeric())
+  spheres = 1:14
+  flag = 1
   cnt <- 1
   for (j in seq(1,length(cases))){
-    for (k in seq(1,14)){
+    id = as.numeric(data[cases[j],"id"])
+    for (k in spheres){
+      phantomTemperature = as.numeric(data[cases[j],"phantom.temperature"])
+      phantomVersion = as.numeric(data[cases[j],"phantom.version"])
+      refT1 = temperature_correction(phantomTemperature,phantomVersion)
+      
       magData = as.numeric(unlist(listSpheres[[cases[j]]][k]))
       compData = as.numeric(unlist(listSpheres[[cases[j]+1]][k]))
       
+      ##DATA FOR LONG DATAFRAME FORMAT
+      sid_long <- as.matrix(rep(id,length(magData)))
+      sph_long <- as.matrix(rep(k,length(magData)))
+      refT1_long <- as.matrix(rep(refT1[k],length(magData)))
+      
+      data_MagComp_long <- data.frame(sid_long, sph_long, refT1_long, magData, compData)
+      
+      if (j==1 && flag==1){
+        dataTmp_long = rbind(data.frame(), data_MagComp_long)
+        flag = 0
+      }
+      else{
+        dataComparison_long = rbind(dataTmp_long, data_MagComp_long)
+        dataTmp_long <- dataComparison_long
+      }
+
+      ##DIFERENCE BETWEEN MAGNITUDE AND COMPLEX
       meanMag[k,j] = mean(magData)
       meanComp[k,j] = mean(compData)
       
-      ##DIFERENCE BETWEEN MAGNITUDE AND COMPLEX
       diff_Mag_Comp[k,j] = abs(mean(magData) - mean(compData))
       diff_Perc_Mag_Comp[k,j] = 100*abs(mean(magData) - mean(compData))/(mean(magData) + mean(compData))/2
       
@@ -35,10 +59,6 @@ comparison_magnitude_complex <- function(cases,listSpheres){
         pValues[cnt,k] = wTest[3]
       }
     }
-    
-    phantomTemperature = as.numeric(data[j,"phantom.temperature"])
-    phantomVersion = as.numeric(data[j,"phantom.version"])
-    refT1 = temperature_correction(phantomTemperature,phantomVersion)
     
     id = data[cases[j],"id"]
     sid <- as.matrix(rep(id,14))
@@ -72,9 +92,17 @@ comparison_magnitude_complex <- function(cases,listSpheres){
   colnames(dataCorrelation) <- c('sid', 'sph', 'Magnitude', 'Complex')
   colnames(dataPearson) <- c('Site', 'R', 'p-Value')
   
+  #Correlation coefficients per sphere
+  for (ii in seq(1,length(spheres))){
+    data_per_sphere = subset(dataComparison_long, sph_long == spheres[ii])
+    corr_per_sphere[ii,1] = spheres[ii]
+    corr_per_sphere[ii,2] = cor(data_per_sphere$magData,data_per_sphere$compData)
+  }
+  
   returnComparison <- list("dataMagComp" = dataComparison,
                            "dataCorr" = dataCorrelation,
                            "PearsonCorr" = dataPearson,
+                           "PearsonCorrSphere" = dataComparison_long,
                            "pValues" = pValues)
   
   return(returnComparison)
