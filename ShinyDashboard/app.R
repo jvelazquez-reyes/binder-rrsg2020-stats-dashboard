@@ -69,10 +69,10 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                       multiple = FALSE
                                   ),
                                   
-                                  h2("Correlation coefficients"),
-                                  h1("Complete phantom"),
+                                  h4("Correlation coefficients"),
+                                  h6("Complete phantom"),
                                   tableOutput(outputId = "PearsonCorr"),
-                                  h1("Per Sphere"),
+                                  h6("Per Sphere"),
                                   tableOutput(outputId = "PearsonMagCompPerSphere")
                               ),
                               
@@ -81,7 +81,9 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                   #h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
                                   #1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
                                   #   and 6.010 - Complex data."),
-                                  plotlyOutput(outputId = "CorrMagComp")
+                                  plotlyOutput(outputId = "CorrMagComp"),
+                                  h3("Correlation between Magnitude and Complex per Sphere"),
+                                  plotlyOutput(outputId = "DispAllPointsMagComp")
                               )
                           )
                  ),
@@ -280,7 +282,7 @@ server <- function(input, output) {
     MagCom_colors <- setNames(rainbow(nrow(magVScomp$dataMagComp)), magVScomp$dataMagComp$sid)
     output$MagComp <- renderPlotly({
         if (input$typeComparison == "Difference"){
-            plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~diff, split = ~sid, color = ~sid, colors = MagCom_colors) %>%
+            plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~diff, split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
                 filter(sid %in% input$DiffSitesID) %>%
                 #group_by(sid) %>%
                 add_trace(type = 'scatter', mode = 'lines+markers',
@@ -292,7 +294,7 @@ server <- function(input, output) {
                        legend = list(title = list(text = "<b>Site ID</b>")))
         }
         else if (input$typeComparison == "Difference (%)"){
-            plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~percDiff, split = ~sid, color = ~sid, colors = MagCom_colors) %>%
+            plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~percDiff, split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
                 filter(sid %in% input$DiffSitesID) %>%
                 #group_by(sid) %>%
                 add_trace(type = 'scatter', mode = 'lines+markers',
@@ -330,21 +332,42 @@ server <- function(input, output) {
     
     output$PearsonCorr <- renderTable(magVScomp$PearsonCorr)
     
+    output$DispAllPointsMagComp <- renderPlotly({
+        DispersionAllPointsMagComp <- subset(magVScomp$PearsonCorrSphere, sid_long == input$CorrSitesID)
+        
+        p <- ggplot(data = DispersionAllPointsMagComp) +
+            geom_point(aes(x = compData, y = magData, color = sph_long,
+                           text = paste('<br> Magnitude: ', signif(magData,6),
+                                        '<br> Complex: ', signif(compData,6),
+                                        '<br> Sphere: ', sph_long)),
+                       color = "black", size = 1.5) +
+            labs(x = "Complex T1 value (ms)", y = "Magnitude T1 value (ms)") +
+            geom_smooth(aes(x = compData, y = magData), method = "lm", formula = y~x,
+                        se = FALSE, color = "red", lwd = 0.5) +
+            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                               axis.title = element_text(size = 12),
+                               axis.text = element_text(size = 12))
+        p <- p + guides(fill=guide_legend(title="Site ID"))
+        ggplotly(p, tooltip = "text")
+    })
+    
     spheres = 1:14
-    #corr_per_sphere = reactiveValues(df = data.frame(Sphere=as.integer(), R=as.numeric()))
-    corr_per_sphere <- data.frame(Sphere=as.integer(), R=as.numeric())
-    dataMagCompSphere = comparison_magnitude_complex(cases, listSpheres)
-    #corr_per_sphere$df <- data.frame(Sphere=as.integer(), R=as.numeric())
-    my_data <- reactive({
+    corr_per_sphere = reactiveValues(df = data.frame(Sphere=as.integer(), R=as.numeric()))
+    dataMagCompSphere = comparison_magnitude_complex(cases)
+    observeEvent(input$CorrSitesID,{
         for (ii in seq(1,length(spheres))){
-            
-            data_per_sphere = subset(dataMagCompSphere$PearsonCorrSphere, sid_long == input$CorrSitesID[1] & sph_long == spheres[ii])
+            data_per_sphere = subset(dataMagCompSphere$PearsonCorrSphere, sid_long == input$CorrSitesID & sph_long == spheres[ii])
             corr_per_sphere$df[ii,1] = spheres[ii]
             corr_per_sphere$df[ii,2] = cor(data_per_sphere$magData,data_per_sphere$compData)
         }
-        
     })
-    output$PearsonMagCompPerSphere <- renderTable(my_data())
+    output$PearsonMagCompPerSphere <- renderTable({corr_per_sphere$df})
     
     #TAB 3
     sitesFiltered_colors <- setNames(rainbow(nrow(MeasSites$dataSite)), MeasSites$dataSite$ID_Site)

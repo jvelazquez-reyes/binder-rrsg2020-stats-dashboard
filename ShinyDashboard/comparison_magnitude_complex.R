@@ -1,4 +1,4 @@
-comparison_magnitude_complex <- function(cases,listSpheres){
+comparison_magnitude_complex <- function(cases){
   pValues = data.frame()
   meanMag = data.frame()
   meanComp = data.frame()
@@ -60,7 +60,7 @@ comparison_magnitude_complex <- function(cases,listSpheres){
       }
     }
     
-    id = data[cases[j],"id"]
+    #id = data[cases[j],"id"]
     sid <- as.matrix(rep(id,14))
     sph <- as.matrix(1:14)
     t1 <- as.matrix(refT1)
@@ -77,6 +77,11 @@ comparison_magnitude_complex <- function(cases,listSpheres){
       dataTmp = rbind(data.frame(), data_Mag_Comp)
       corrTmp = rbind(data.frame(), corr_Mag_Comp)
       PearsonTmp = rbind(data.frame(), Pearson_test)
+      if (length(cases)==1){
+        dataComparison = dataTmp
+        dataCorrelation = corrTmp
+        dataPearson = PearsonTmp
+      }
     }
     else{
       dataComparison = rbind(dataTmp, data_Mag_Comp)

@@ -27,7 +27,7 @@ source("comparison_magnitude_complex.R")
 cases <- c(1,seq(11,25,2),34,36)
 
 #p-value > 0.5, there's no statistical difference between magnitude and complex
-magVScomp <- comparison_magnitude_complex(cases,listSpheres)
+magVScomp <- comparison_magnitude_complex(cases)
 
 #Germany <- 13:26
 #Montreal <- c(4,11,12,27:30,40)
