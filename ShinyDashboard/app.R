@@ -58,9 +58,14 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                   plotlyOutput(outputId = "MagComp"),
                               )
                           ),
-                          
+                          shinyjs::useShinyjs(),
                           sidebarLayout(
                               sidebarPanel(
+                                  radioButtons(inputId = "test22",
+                                               label = "Compare Magnitude VS Complex Per Site or All Sites",
+                                               choices = c("Per Site", "All Sites"),
+                                               selected = "Per Site"),
+                                  
                                   selectizeInput(
                                       inputId = "CorrSitesID", 
                                       label = "Select a site to show a dispersion plot", 
@@ -306,13 +311,14 @@ server <- function(input, output) {
                        legend = list(title = list(text = "<b>Site ID</b>")))
         }
     })
-        
+    
     output$CorrMagComp <- renderPlotly({
         p <- ggplot(data = filter(magVScomp$dataCorr, sid %in% input$CorrSitesID)) +
             geom_point(aes(x = Complex, y = Magnitude,
                            text = paste0('<br> Complex: ', signif(Complex,5),
-                                        '<br> Magnitude: ', signif(Magnitude,5),
-                                        '<br> Sphere: ', sph)),
+                                         '<br> Magnitude: ', signif(Magnitude,5),
+                                         '<br> Sphere: ', sph,
+                                         '<br> ID: ', sid)),
                        color = "black", size = 1.5) +
             labs(x = "Complex T1 value (ms)", y = "Magnitude T1 value (ms)") +
             geom_smooth(aes(x = Complex, y = Magnitude), method = "lm", se = TRUE, color = "red", lwd = 0.5,
@@ -332,43 +338,65 @@ server <- function(input, output) {
     
     output$PearsonCorr <- renderTable(magVScomp$PearsonCorr)
     
-    output$DispAllPointsMagComp <- renderPlotly({
-        DispersionAllPointsMagComp <- subset(magVScomp$PearsonCorrSphere, sid_long == input$CorrSitesID)
-        
-        p <- ggplot(data = DispersionAllPointsMagComp) +
-            geom_point(aes(x = compData, y = magData, color = sph_long,
-                           text = paste('<br> Magnitude: ', signif(magData,6),
-                                        '<br> Complex: ', signif(compData,6),
-                                        '<br> Sphere: ', sph_long)),
-                       color = "black", size = 1.5) +
-            labs(x = "Complex T1 value (ms)", y = "Magnitude T1 value (ms)") +
-            geom_smooth(aes(x = compData, y = magData), method = "lm", formula = y~x,
-                        se = FALSE, color = "red", lwd = 0.5) +
-            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        p <- p + guides(fill=guide_legend(title="Site ID"))
-        ggplotly(p, tooltip = "text")
+    toListen <- reactive({
+        list(input$test22,input$CorrSitesID)
     })
-    
-    spheres = 1:14
-    corr_per_sphere = reactiveValues(df = data.frame(Sphere=as.integer(), R=as.numeric()))
-    dataMagCompSphere = comparison_magnitude_complex(cases)
-    observeEvent(input$CorrSitesID,{
-        for (ii in seq(1,length(spheres))){
-            data_per_sphere = subset(dataMagCompSphere$PearsonCorrSphere, sid_long == input$CorrSitesID & sph_long == spheres[ii])
-            corr_per_sphere$df[ii,1] = spheres[ii]
-            corr_per_sphere$df[ii,2] = cor(data_per_sphere$magData,data_per_sphere$compData)
+    observeEvent(toListen(), {
+        if(input$test22=="Per Site"){
+            dataMagCompSphere = comparison_magnitude_complex(cases)
+            
+            
+            spheres = 1:14
+            corr_per_sphere = reactiveValues(df = data.frame(Sphere=as.integer(), R=as.numeric(), Lin=as.numeric()))
+                
+            DispersionAllPointsMagComp <- subset(dataMagCompSphere$PearsonCorrSphere, sid_long == input$CorrSitesID)
+            for (ii in seq(1,length(spheres))){
+                data_per_sphere = subset(dataMagCompSphere$PearsonCorrSphere, sid_long == input$CorrSitesID & sph_long == spheres[ii])
+                corr_per_sphere$df[ii,1] = spheres[ii]
+                corr_per_sphere$df[ii,2] = cor(data_per_sphere$magData,data_per_sphere$compData)
+                corr_per_sphere$df[ii,3] = epi.ccc(data_per_sphere$magData,data_per_sphere$compData)[[1]][1]
+            }
+            
+        }else if(input$test22=="All Sites"){
+            dataMagCompSphere = comparison_magnitude_complex(cases)
+            DispersionAllPointsMagComp <- dataMagCompSphere$PearsonCorrSphere
+            spheres = 1:14
+            corr_per_sphere = reactiveValues(df = data.frame(Sphere=as.integer(), R=as.numeric(), Lin=as.numeric()))
+            for (ii in seq(1,length(spheres))){
+                data_per_sphere = subset(dataMagCompSphere$PearsonCorrSphere, sph_long == spheres[ii])
+                corr_per_sphere$df[ii,1] = spheres[ii]
+                corr_per_sphere$df[ii,2] = cor(data_per_sphere$magData,data_per_sphere$compData)
+                corr_per_sphere$df[ii,3] = epi.ccc(data_per_sphere$magData,data_per_sphere$compData)[[1]][1]
+            }
         }
+        
+        output$DispAllPointsMagComp <- renderPlotly({
+            p <- ggplot(data = DispersionAllPointsMagComp) +
+                geom_point(aes(x = compData, y = magData, color = sph_long,
+                               text = paste('<br> Magnitude: ', signif(magData,6),
+                                            '<br> Complex: ', signif(compData,6),
+                                            '<br> Sphere: ', sph_long,
+                                            '<br> ID: ', sid_long)),
+                           color = "black", size = 1.5) +
+                labs(x = "Complex T1 value (ms)", y = "Magnitude T1 value (ms)") +
+                geom_smooth(aes(x = compData, y = magData), method = "lm", formula = y~x,
+                            se = FALSE, color = "red", lwd = 0.5) +
+                geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
+                theme(axis.line = element_line(colour = "black"), 
+                      panel.grid.major = element_blank(), 
+                      panel.grid.minor = element_blank(), 
+                      panel.border = element_blank(), 
+                      panel.background = element_blank()) +
+                theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                                   axis.title = element_text(size = 12),
+                                   axis.text = element_text(size = 12))
+            p <- p + guides(fill=guide_legend(title="Site ID"))
+            ggplotly(p, tooltip = "text")
+        })
+        
+        output$PearsonMagCompPerSphere <- renderTable({corr_per_sphere$df})
     })
-    output$PearsonMagCompPerSphere <- renderTable({corr_per_sphere$df})
-    
+
     #TAB 3
     sitesFiltered_colors <- setNames(rainbow(nrow(MeasSites$dataSite)), MeasSites$dataSite$ID_Site)
     output$CompFiltSites <- renderPlotly({
