@@ -1,4 +1,4 @@
-hierarchical_shift_function <- function(dataSites){
+hierarchical_shift_function <- function(dataSites, sphere){
   #e <- environment()
   a = unique(dataSites$sid_long)
   listdat1 = list()
@@ -18,7 +18,7 @@ hierarchical_shift_function <- function(dataSites){
   ilo <- ilo + 1
   
   for (x in seq(1,length(a))) {
-    subdata = subset(dataSites, sid_long == a[x] & sph_long == input$DispHSF)
+    subdata = subset(dataSites, sid_long == a[x] & sph_long == sphere)
     listdat1[[x]] = subdata$siteData
     listdat2[[x]] = subdata$t1_long
     lengthDAT[x] = nrow(subdata)

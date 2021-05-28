@@ -533,6 +533,7 @@ server <- function(input, output) {
     
     #################HSF#####################
     output$DecilesDiff <- renderPlotly({
+        HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
         p <- ggplot(HSFData$diffDeciles, aes(x = quantile, 
                             y = difference, 
                             colour = participants)) + 
@@ -542,7 +543,7 @@ server <- function(input, output) {
             geom_line(data = HSFData$diffDecilesMD, colour = "black", size = 1) +
             geom_point(data = HSFData$diffDecilesMD, colour = "black") +
             scale_colour_viridis_d(option = "B") +
-            scale_x_continuous(breaks = qseq) +
+            scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
             scale_y_continuous(breaks = seq(-200,100,50)) +
             theme(legend.position = "none",
                   plot.title = element_text(size=22),
@@ -554,18 +555,19 @@ server <- function(input, output) {
     })
     
     output$BootstrapDiff <- renderPlotly({
+        HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
         p <- ggplot(HSFData$diffBootstrap, aes(x = quantile, 
                             y = difference, 
                             colour = participants)) + 
             theme_classic() +
             geom_line(alpha = 0.5) +
             geom_abline(slope = 0, intercept = 0) +
-            geom_line(data = df.md, colour = "black", size = 1) +
+            geom_line(data = HSFData$diffBootstrapMD, colour = "black", size = 1) +
             # geom_point(data = HSFData$diffBootstrapMD, colour = "black", size = 2) +
             geom_pointrange(data = HSFData$diffBootstrapMD, aes(ymin = ymin, ymax = ymax), 
                             colour = "black", size = 0.75) +
             scale_colour_viridis_d(option = "B") +
-            scale_x_continuous(breaks = qseq) +
+            scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
             # scale_y_continuous(breaks = seq(-500,700,250)) +
             # coord_cartesian(ylim = c(-500, 700)) +
             theme(legend.position = "none",
@@ -581,6 +583,7 @@ server <- function(input, output) {
     })
     
     output$BootstrapDensities <- renderPlotly({
+        HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
         p <- ggplot(HSFData$densitiesBootstrap, aes(x = boot_samp, y = quantile)) +
             theme_classic() +
             stat_halfeye(#fill = "orange", 
@@ -588,7 +591,7 @@ server <- function(input, output) {
                 .width = c(0.5, 0.9)
             ) +
             geom_vline(xintercept = 0) +
-            scale_y_continuous(breaks = qseq) +
+            scale_y_continuous(breaks = seq(0.1,0.9,0.1)) +
             theme(plot.title = element_text(size=22),
                   axis.title.x = element_text(size = 18),
                   axis.text = element_text(size = 16, colour = "black"),
