@@ -532,56 +532,15 @@ server <- function(input, output) {
     })
     
     #################HSF#####################
-    a = unique(MeasSites$dataSite_long$sid_long)
-    listdat1 = list()
-    listdat2 = list()
-    lengthDAT = array()
-    
-    # analysis parameters
-    np = 20
-    qseq <- seq(0.1,0.9,0.1) # quantiles
-    alpha <- 0.05
-    nboot <- 1000 # bootstrap
-    tr <- 0.2 # group trimmed mean for each quantile
-    nq <- length(qseq)
-    icrit <- round((1-alpha)*nboot) # 95th quantile
-    ilo <- round((alpha/2)*nboot)
-    iup <- nboot - ilo
-    ilo <- ilo + 1
-    
     output$DecilesDiff <- renderPlotly({
-        for (x in seq(1,length(a))) {
-            subdata = subset(MeasSites$dataSite_long, sid_long == a[x] & sph_long == input$DispHSF)
-            listdat1[[x]] = subdata$siteData
-            listdat2[[x]] = subdata$t1_long
-            lengthDAT[x] = nrow(subdata)
-        }
-        dat1 = stri_list2matrix(listdat1, byrow=TRUE, fill=NA)
-        dat2 = stri_list2matrix(listdat2, byrow=TRUE, fill=NA)
-        dat1 = `dim<-`(as.numeric(dat1), dim(dat1))
-        dat2 = `dim<-`(as.numeric(dat2), dim(dat2))
-        nt = max(lengthDAT)
-        
-        qdiff <- t(apply(dat1, 1, quantile, probs = qseq, type = 8, names = FALSE, na.rm = TRUE) - 
-                       apply(dat2, 1, quantile, probs = qseq, type = 8, names = FALSE, na.rm = TRUE))
-        
-        gptm <- apply(qdiff, 2, mean, trim = tr)
-        
-        df <- tibble(difference = as.vector(qdiff),
-                     quantile = rep(qseq, each = np),
-                     participants = factor(rep(seq(1:np), nq)))
-        
-        df.md <- tibble(difference = gptm,
-                        quantile = qseq)
-        
-        p <- ggplot(df, aes(x = quantile, 
+        p <- ggplot(HSFData$diffDeciles, aes(x = quantile, 
                             y = difference, 
                             colour = participants)) + 
             theme_classic() +
             geom_line(alpha = 0.5) +
             geom_abline(slope = 0, intercept = 0) +
-            geom_line(data = df.md, colour = "black", size = 1) +
-            geom_point(data = df.md, colour = "black") +
+            geom_line(data = HSFData$diffDecilesMD, colour = "black", size = 1) +
+            geom_point(data = HSFData$diffDecilesMD, colour = "black") +
             scale_colour_viridis_d(option = "B") +
             scale_x_continuous(breaks = qseq) +
             scale_y_continuous(breaks = seq(-200,100,50)) +
@@ -595,75 +554,15 @@ server <- function(input, output) {
     })
     
     output$BootstrapDiff <- renderPlotly({
-        set.seed(8899)
-        
-        for (x in seq(1,length(a))) {
-            subdata = subset(MeasSites$dataSite_long, sid_long == a[x] & sph_long == input$DispHSF)
-            listdat1[[x]] = subdata$siteData
-            listdat2[[x]] = subdata$t1_long
-            lengthDAT[x] = nrow(subdata)
-        }
-        dat1 = stri_list2matrix(listdat1, byrow=TRUE, fill=NA)
-        dat2 = stri_list2matrix(listdat2, byrow=TRUE, fill=NA)
-        dat1 = `dim<-`(as.numeric(dat1), dim(dat1))
-        dat2 = `dim<-`(as.numeric(dat2), dim(dat2))
-        nt = max(lengthDAT)
-        
-        
-        
-        boot_data1 <- array(data = 0, dim = c(np, nt))
-        boot_data2 <- array(data = 0, dim = c(np, nt))
-        boot_qdiff <- array(data = 0, dim = c(nboot, nq, np))
-        
-        for(B in 1:nboot){
-            
-            # bootstrap participants
-            boot_id <- sample(np, np, replace = TRUE)
-            
-            for(CP in 1:np){ # bootstrap trials
-                boot_data1[CP,] <- sample(dat1[boot_id[CP],], nt, replace = TRUE)
-                boot_data2[CP,] <- sample(dat2[boot_id[CP],], nt, replace = TRUE)
-            }
-            
-            boot_qdiff[B,,] <- apply(boot_data1, 1, quantile, probs = qseq, type = 8, names = FALSE, na.rm = TRUE) - 
-                apply(boot_data2, 1, quantile, probs = qseq, type = 8, names = FALSE, na.rm = TRUE)
-            
-        }
-        
-        boot_tm <- apply(boot_qdiff, c(1,2), mean, trim = tr)
-        sort_boot_tm <- apply(boot_tm, 2, sort)
-        boot_ci <- matrix(data = 0, nrow = 2, ncol = nq)
-        boot_ci[1,] <- sort_boot_tm[ilo,]
-        boot_ci[2,] <- sort_boot_tm[iup,]
-        
-        boot_hdi <- apply(boot_tm, 2, HDInterval::hdi, credMass = 1-alpha)
-        
-        int_to_plot <- boot_ci 
-        int_to_plot <- boot_hdi
-        
-        qdiff <- t(apply(dat1, 1, quantile, probs = qseq, type = 8, names = FALSE, na.rm = TRUE) - 
-                       apply(dat2, 1, quantile, probs = qseq, type = 8, names = FALSE, na.rm = TRUE))
-        
-        gptm <- apply(qdiff, 2, mean, trim = tr)
-        
-        df <- tibble(difference = as.vector(qdiff),
-                     quantile = rep(qseq, each = np),
-                     participants = factor(rep(seq(1:np), nq)))
-        
-        df.md <- tibble(difference = gptm,
-                        quantile = qseq,
-                        ymin = int_to_plot[1,],
-                        ymax = int_to_plot[2,])
-        
-        p <- ggplot(df, aes(x = quantile, 
+        p <- ggplot(HSFData$diffBootstrap, aes(x = quantile, 
                             y = difference, 
                             colour = participants)) + 
             theme_classic() +
             geom_line(alpha = 0.5) +
             geom_abline(slope = 0, intercept = 0) +
             geom_line(data = df.md, colour = "black", size = 1) +
-            # geom_point(data = df.md, colour = "black", size = 2) +
-            geom_pointrange(data = df.md, aes(ymin = ymin, ymax = ymax), 
+            # geom_point(data = HSFData$diffBootstrapMD, colour = "black", size = 2) +
+            geom_pointrange(data = HSFData$diffBootstrapMD, aes(ymin = ymin, ymax = ymax), 
                             colour = "black", size = 0.75) +
             scale_colour_viridis_d(option = "B") +
             scale_x_continuous(breaks = qseq) +
@@ -682,9 +581,7 @@ server <- function(input, output) {
     })
     
     output$BootstrapDensities <- renderPlotly({
-        df <- tibble(boot_samp = as.vector(boot_tm),
-                     quantile = rep(qseq, each = nboot))
-        p <- ggplot(df, aes(x = boot_samp, y = quantile)) +
+        p <- ggplot(HSFData$densitiesBootstrap, aes(x = boot_samp, y = quantile)) +
             theme_classic() +
             stat_halfeye(#fill = "orange", 
                 point_interval = mode_hdi,
