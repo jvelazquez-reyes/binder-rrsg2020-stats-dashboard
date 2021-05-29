@@ -532,76 +532,37 @@ server <- function(input, output) {
     })
     
     #################HSF#####################
+    HSFData <- hierarchical_shift_function(dataSites)
     output$DecilesDiff <- renderPlotly({
-        HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
-        p <- ggplot(HSFData$diffDeciles, aes(x = quantile, 
-                            y = difference, 
-                            colour = participants)) + 
-            theme_classic() +
-            geom_line(alpha = 0.5) +
-            geom_abline(slope = 0, intercept = 0) +
-            geom_line(data = HSFData$diffDecilesMD, colour = "black", size = 1) +
-            geom_point(data = HSFData$diffDecilesMD, colour = "black") +
-            scale_colour_viridis_d(option = "B") +
-            scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
-            scale_y_continuous(breaks = seq(-200,100,50)) +
-            theme(legend.position = "none",
-                  plot.title = element_text(size=22),
-                  axis.title.x = element_text(size = 18),
-                  axis.text = element_text(size = 16, colour = "black"),
-                  axis.title.y = element_text(size = 18)) + 
-            labs(x = "Deciles", y = "Difference")
-        p
+        subplot(HSFData[[1]][3], HSFData[[1]][2], HSFData[[1]][1])
     })
     
     output$BootstrapDiff <- renderPlotly({
-        HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
-        p <- ggplot(HSFData$diffBootstrap, aes(x = quantile, 
-                            y = difference, 
-                            colour = participants)) + 
-            theme_classic() +
-            geom_line(alpha = 0.5) +
-            geom_abline(slope = 0, intercept = 0) +
-            geom_line(data = HSFData$diffBootstrapMD, colour = "black", size = 1) +
-            # geom_point(data = HSFData$diffBootstrapMD, colour = "black", size = 2) +
-            geom_pointrange(data = HSFData$diffBootstrapMD, aes(ymin = ymin, ymax = ymax), 
-                            colour = "black", size = 0.75) +
-            scale_colour_viridis_d(option = "B") +
-            scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
-            # scale_y_continuous(breaks = seq(-500,700,250)) +
-            # coord_cartesian(ylim = c(-500, 700)) +
-            theme(legend.position = "none",
-                  plot.title = element_text(size=22),
-                  axis.title.x = element_text(size = 18),
-                  axis.text = element_text(size = 16, colour = "black"),
-                  axis.title.y = element_text(size = 18)) + 
-            labs(x = "Deciles", y = "Differences")
-        # coord_flip()
-        # ggtitle("Non-Word - Word decile differences")
-        p
-        #p.id <- p
+        #HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
+        subplot(HSFData[[2]][3], HSFData[[2]][2], HSFData[[2]][1])
+        
     })
     
-    output$BootstrapDensities <- renderPlotly({
-        HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
-        p <- ggplot(HSFData$densitiesBootstrap, aes(x = boot_samp, y = quantile)) +
-            theme_classic() +
-            stat_halfeye(#fill = "orange", 
-                point_interval = mode_hdi,
-                .width = c(0.5, 0.9)
-            ) +
-            geom_vline(xintercept = 0) +
-            scale_y_continuous(breaks = seq(0.1,0.9,0.1)) +
-            theme(plot.title = element_text(size=22),
-                  axis.title.x = element_text(size = 18),
-                  axis.text = element_text(size = 16, colour = "black"),
-                  axis.title.y = element_text(size = 18)) + 
-            xlab("Bootstrap differences") +
-            ylab("Deciles") +
-            #coord_cartesian(xlim = c(-1, 0.1)) +
-            coord_flip()
-        p
-    })
+    #output$BootstrapDensities <- renderPlotly({
+    #    HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
+    #    p <- ggplot(HSFData$densitiesBootstrap, aes(x = boot_samp, y = quantile)) +
+    #        theme_classic() +
+    #        stat_halfeye(#fill = "orange", 
+    #            point_interval = mode_hdi,
+    #            .width = c(0.5, 0.9)
+    #        ) +
+    #        geom_vline(xintercept = 0) +
+    #        scale_y_continuous(breaks = seq(0.1,0.9,0.1)) +
+    #        theme(plot.title = element_text(size=22),
+    #              axis.title.x = element_text(size = 18),
+    #              axis.text = element_text(size = 16, colour = "black"),
+    #              axis.title.y = element_text(size = 18)) + 
+    #        xlab("Bootstrap differences") +
+    #        ylab("Deciles") +
+    #        #coord_cartesian(xlim = c(-1, 0.1)) +
+    #        coord_flip()
+    #    p
+    #})
 
     #TAB 4
     output$Disp4Site <- renderPlotly({
