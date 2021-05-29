@@ -3,7 +3,7 @@ hierarchical_shift_function <- function(dataSites){
   listHSFDiff <- list()
   listHSFBootstrapDiff <- list()
   tempTitle = temperature_correction(20,42)
-  for (sph in seq(3,1)){
+  for (sph in seq(14,1)){
     a = unique(dataSites$sid_long)
     listdat1 = list()
     listdat2 = list()
@@ -63,7 +63,7 @@ hierarchical_shift_function <- function(dataSites){
             axis.text = element_text(size = 16, colour = "black"),
             axis.title.y = element_text(size = 18)) + 
       labs(x = "Deciles", y = "Difference")
-    listHSFDiff[[sph]] <- ggplotly(p)
+    listHSFDiff[[sph]] <- p
     
     set.seed(8899)
     
@@ -129,7 +129,7 @@ hierarchical_shift_function <- function(dataSites){
       labs(x = "Deciles", y = "Differences")
     # coord_flip()
     # ggtitle("Non-Word - Word decile differences")
-    listHSFBootstrapDiff[[sph]] <- ggplotly(p)
+    listHSFBootstrapDiff[[sph]] <- p
     #p.id <- p
     
     df3 <- tibble(boot_samp = as.vector(boot_tm),
