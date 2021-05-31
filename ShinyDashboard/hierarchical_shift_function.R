@@ -40,14 +40,14 @@ hierarchical_shift_function <- function(dataSites){
     
     df1 <- tibble(difference = as.vector(qdiff),
                   quantile = rep(qseq, each = np),
-                  participants = factor(rep(seq(1:np), nq)))
+                  site = factor(rep(seq(1:np), nq)))
     
     df1.md <- tibble(difference = gptm,
                      quantile = qseq)
     
     p <- ggplot(df1, aes(x = quantile, 
                          y = difference, 
-                         colour = participants)) + 
+                         colour = site)) + 
       theme_classic() +
       geom_line(alpha = 0.5) +
       geom_abline(slope = 0, intercept = 0) +
@@ -55,7 +55,7 @@ hierarchical_shift_function <- function(dataSites){
       geom_point(data = df1.md, colour = "black") +
       scale_colour_viridis_d(option = "B") +
       scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
-      scale_y_continuous(breaks = seq(-300,300,50)) +
+      scale_y_continuous(limits = c(-300,300), breaks = seq(-300,300,50)) +
       ggtitle(paste("Reference Temperature (ms): ", signif(tempTitle[sph],5))) +
       theme(legend.position = "none",
             plot.title = element_text(size=18),
@@ -99,7 +99,7 @@ hierarchical_shift_function <- function(dataSites){
     
     df2 <- tibble(difference = as.vector(qdiff),
                   quantile = rep(qseq, each = np),
-                  participants = factor(rep(seq(1:np), nq)))
+                  site = factor(rep(seq(1:np), nq)))
     
     df2.md <- tibble(difference = gptm,
                      quantile = qseq,
@@ -108,7 +108,7 @@ hierarchical_shift_function <- function(dataSites){
     
     p <- ggplot(df2, aes(x = quantile, 
                                            y = difference, 
-                                           colour = participants)) + 
+                                           colour = site)) + 
       theme_classic() +
       geom_line(alpha = 0.5) +
       geom_abline(slope = 0, intercept = 0) +
@@ -118,7 +118,7 @@ hierarchical_shift_function <- function(dataSites){
                       colour = "black", size = 0.75) +
       scale_colour_viridis_d(option = "B") +
       scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
-      scale_y_continuous(breaks = seq(-300,300,50)) +
+      scale_y_continuous(limits = c(-300,300), breaks = seq(-300,300,50)) +
       # coord_cartesian(ylim = c(-500, 700)) +
       ggtitle(paste("Reference Temperature (ms): ", signif(tempTitle[sph],5))) +
       theme(legend.position = "none",

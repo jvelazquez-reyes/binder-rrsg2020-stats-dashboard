@@ -159,17 +159,11 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                  #TAB 4
                  tabPanel("HSF",
                           tabsetPanel(sidebarLayout(
-                              sidebarPanel(width = 1,
-                                  selectizeInput(
-                                      inputId = "DispHSF", 
-                                      label = "Select a sphere", 
-                                      choices = unique(MeasSites$dataSite_long$sph_long),
-                                      multiple = FALSE)
-                              ),
-                              
+                              sidebarPanel(width = 0.5),
                               mainPanel(
-                                  h3("Deciles Differences"),
-                                  plotOutput(outputId = "DecilesDiff", height = 1600, width = 1600)
+                                  h3("Bootstrapped Differences"),
+                                  plotOutput(outputId = "BootstrapDiff", height = 1600, width = 1600),
+                                  #plotOutput(outputId = "BootstrapDensities")
                               )
                           )
                           ),
@@ -177,9 +171,8 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                           tabsetPanel(sidebarLayout(
                               sidebarPanel(width = 0.5),
                               mainPanel(
-                                  h3("Bootstrapped Differences"),
-                                  plotlyOutput(outputId = "BootstrapDiff", height = 1600, width = 1600),
-                                  #plotOutput(outputId = "BootstrapDensities")
+                                  h3("Decile Differences"),
+                                  plotlyOutput(outputId = "DecilesDiff", height = 1600, width = 1600)
                               )
                           )
                           )
@@ -545,26 +538,7 @@ server <- function(input, output) {
     #TAB 4
     #################HSF#####################
     HSFData <- hierarchical_shift_function(dataSites)
-    output$DecilesDiff <- renderPlot({
-        g14 <- HSFData$diffDeciles[[14]]
-        g13 <- HSFData$diffDeciles[[13]]
-        g12 <- HSFData$diffDeciles[[12]]
-        g11 <- HSFData$diffDeciles[[11]]
-        g10 <- HSFData$diffDeciles[[10]]
-        g9 <- HSFData$diffDeciles[[9]]
-        g8 <- HSFData$diffDeciles[[8]]
-        g7 <- HSFData$diffDeciles[[7]]
-        g6 <- HSFData$diffDeciles[[6]]
-        g5 <- HSFData$diffDeciles[[5]]
-        g4 <- HSFData$diffDeciles[[4]]
-        g3 <- HSFData$diffDeciles[[3]]
-        g2 <- HSFData$diffDeciles[[2]]
-        g1 <- HSFData$diffDeciles[[1]]
-        gs = list(g14,g13,g12,g11,g10,g9,g8,g7,g6,g5,g4,g3,g2,g1)
-        gridExtra::grid.arrange(grobs=gs, ncol = 4)
-    })
-    
-    output$BootstrapDiff <- renderPlotly({
+    output$BootstrapDiff <- renderPlot({
         #HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
         g14 <- HSFData$diffBootstrapDiff[[14]]
         g13 <- HSFData$diffBootstrapDiff[[13]]
@@ -580,10 +554,28 @@ server <- function(input, output) {
         g3 <- HSFData$diffBootstrapDiff[[3]]
         g2 <- HSFData$diffBootstrapDiff[[2]]
         g1 <- HSFData$diffBootstrapDiff[[1]]
-        subplot(g14,g13,g12,g11,g10,g9,g8,g7,g6,g5,g4,g3,g2,g1, nrows = 4)
-        
+        gs = list(g14,g13,g12,g11,g10,g9,g8,g7,g6,g5,g4,g3,g2,g1)
+        gridExtra::grid.arrange(grobs=gs, ncol = 4)
     })
     
+    output$DecilesDiff <- renderPlotly({
+        g14 <- HSFData$diffDeciles[[14]]
+        g13 <- HSFData$diffDeciles[[13]]
+        g12 <- HSFData$diffDeciles[[12]]
+        g11 <- HSFData$diffDeciles[[11]]
+        g10 <- HSFData$diffDeciles[[10]]
+        g9 <- HSFData$diffDeciles[[9]]
+        g8 <- HSFData$diffDeciles[[8]]
+        g7 <- HSFData$diffDeciles[[7]]
+        g6 <- HSFData$diffDeciles[[6]]
+        g5 <- HSFData$diffDeciles[[5]]
+        g4 <- HSFData$diffDeciles[[4]]
+        g3 <- HSFData$diffDeciles[[3]]
+        g2 <- HSFData$diffDeciles[[2]]
+        g1 <- HSFData$diffDeciles[[1]]
+        subplot(g14,g13,g12,g11,g10,g9,g8,g7,g6,g5,g4,g3,g2,g1, nrows = 4)
+    })
+
     #output$BootstrapDensities <- renderPlotly({
     #    HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
     #    p <- ggplot(HSFData$densitiesBootstrap, aes(x = boot_samp, y = quantile)) +
