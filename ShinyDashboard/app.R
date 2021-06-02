@@ -22,10 +22,12 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                  #TAB 1
                  tabPanel("Overview",
                           fluidPage(
-                              htmlOutput("overviewTxt1")
+                              htmlOutput("overviewTxt1"),
+                              mainPanel(img(src='challengePitch.png', height="130%", width="130%", align = "center"))
                           ),
                           fluidPage(
-                              htmlOutput("overviewTxt2")
+                              htmlOutput("overviewTxt2"),
+                              mainPanel(img(src='rrsg2020Repo.png', height="90%", width="90%", align = "center"))
                           ),
                           fluidPage(
                               htmlOutput("overviewTxt3")
