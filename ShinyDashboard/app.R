@@ -1,5 +1,8 @@
 library("Metrics")
 library("ggplot2")
+library("rogme")
+library("tibble")
+library("stringi")
 library("epiR")
 library("rjson")
 library("lme4")
