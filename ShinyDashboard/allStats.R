@@ -107,6 +107,11 @@ sdFilteredSites <- measuredT1_against_referenceT1(filteredSites)
 sdMontreal <- measuredT1_against_referenceT1(Montreal)
 sdGermany <- measuredT1_against_referenceT1(Germany)
 
+##HIERARCHICAL_SHIFT_FUNCTION##
+source("hierarchical_shift_function.R")
+
+dataSites <- MeasSites$dataSite_long
+
 ##LINEAR MIXED EFFECTS MODEL##
 source("linear_mixed_effects_model.R")
 

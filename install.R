@@ -1,5 +1,6 @@
 install.packages("reticulate")
 install.packages("Metrics")
+install.packages("gridExtra")
 install.packages("ggplot2")
 install.packages("HDInterval")
 install.packages("devtools")

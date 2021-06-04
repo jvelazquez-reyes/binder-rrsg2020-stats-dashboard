@@ -10,7 +10,6 @@ library("irr")
 library("sjPlot")
 library("plotly")
 library("shiny")
-library("shinyjs")
 library("shinythemes")
 library("shinydashboard")
 
@@ -22,10 +21,12 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                  #TAB 1
                  tabPanel("Overview",
                           fluidPage(
-                              htmlOutput("overviewTxt1")
+                              htmlOutput("overviewTxt1"),
+                              mainPanel(img(src='challengePitch.png', height="130%", width="130%", align = "center"))
                           ),
                           fluidPage(
-                              htmlOutput("overviewTxt2")
+                              htmlOutput("overviewTxt2"),
+                              mainPanel(img(src='rrsg2020Repo.png', height="90%", width="90%", align = "center"))
                           ),
                           fluidPage(
                               htmlOutput("overviewTxt3")
@@ -157,6 +158,28 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                  ),
                  
                  #TAB 4
+                 tabPanel("HSF",
+                          tabsetPanel(sidebarLayout(
+                              sidebarPanel(width = 0.5),
+                              mainPanel(
+                                  h3("Bootstrapped Differences"),
+                                  plotOutput(outputId = "BootstrapDiff", height = 1600, width = 1600),
+                                  #plotOutput(outputId = "BootstrapDensities")
+                              )
+                          )
+                          ),
+                          
+                          tabsetPanel(sidebarLayout(
+                              sidebarPanel(width = 0.5),
+                              mainPanel(
+                                  h3("Decile Differences"),
+                                  plotlyOutput(outputId = "DecilesDiff", height = 1600, width = 1600)
+                              )
+                          )
+                          )
+                 ),
+                 
+                 #TAB 5
                  navbarMenu("Measured VS Reference T1",
                             tabPanel("Site",
                                      sidebarLayout(
@@ -212,7 +235,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                             )
                  ),
                  
-                 #TAB 5
+                 #TAB 6
                  tabPanel("Standard Deviation",
                           tabsetPanel(sidebarLayout(
                               sidebarPanel(
@@ -234,7 +257,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                           )
                 )
                 
-                #TAB 6
+                #TAB 7
                 #tabPanel("LMEM",
                 #         sidebarLayout(
                 #             sidebarPanel(
@@ -512,8 +535,70 @@ server <- function(input, output) {
         
         CorrTableSites$corrSph_across_sites
     })
-
+    
     #TAB 4
+    #################HSF#####################
+    HSFData <- hierarchical_shift_function(dataSites)
+    output$BootstrapDiff <- renderPlot({
+        #HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
+        g14 <- HSFData$diffBootstrapDiff[[14]]
+        g13 <- HSFData$diffBootstrapDiff[[13]]
+        g12 <- HSFData$diffBootstrapDiff[[12]]
+        g11 <- HSFData$diffBootstrapDiff[[11]]
+        g10 <- HSFData$diffBootstrapDiff[[10]]
+        g9 <- HSFData$diffBootstrapDiff[[9]]
+        g8 <- HSFData$diffBootstrapDiff[[8]]
+        g7 <- HSFData$diffBootstrapDiff[[7]]
+        g6 <- HSFData$diffBootstrapDiff[[6]]
+        g5 <- HSFData$diffBootstrapDiff[[5]]
+        g4 <- HSFData$diffBootstrapDiff[[4]]
+        g3 <- HSFData$diffBootstrapDiff[[3]]
+        g2 <- HSFData$diffBootstrapDiff[[2]]
+        g1 <- HSFData$diffBootstrapDiff[[1]]
+        gs = list(g14,g13,g12,g11,g10,g9,g8,g7,g6,g5,g4,g3,g2,g1)
+        gridExtra::grid.arrange(grobs=gs, ncol = 4)
+    })
+    
+    output$DecilesDiff <- renderPlotly({
+        g14 <- HSFData$diffDeciles[[14]]
+        g13 <- HSFData$diffDeciles[[13]]
+        g12 <- HSFData$diffDeciles[[12]]
+        g11 <- HSFData$diffDeciles[[11]]
+        g10 <- HSFData$diffDeciles[[10]]
+        g9 <- HSFData$diffDeciles[[9]]
+        g8 <- HSFData$diffDeciles[[8]]
+        g7 <- HSFData$diffDeciles[[7]]
+        g6 <- HSFData$diffDeciles[[6]]
+        g5 <- HSFData$diffDeciles[[5]]
+        g4 <- HSFData$diffDeciles[[4]]
+        g3 <- HSFData$diffDeciles[[3]]
+        g2 <- HSFData$diffDeciles[[2]]
+        g1 <- HSFData$diffDeciles[[1]]
+        subplot(g14,g13,g12,g11,g10,g9,g8,g7,g6,g5,g4,g3,g2,g1, nrows = 4)
+    })
+
+    #output$BootstrapDensities <- renderPlotly({
+    #    HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
+    #    p <- ggplot(HSFData$densitiesBootstrap, aes(x = boot_samp, y = quantile)) +
+    #        theme_classic() +
+    #        stat_halfeye(#fill = "orange", 
+    #            point_interval = mode_hdi,
+    #            .width = c(0.5, 0.9)
+    #        ) +
+    #        geom_vline(xintercept = 0) +
+    #        scale_y_continuous(breaks = seq(0.1,0.9,0.1)) +
+    #        theme(plot.title = element_text(size=22),
+    #              axis.title.x = element_text(size = 18),
+    #              axis.text = element_text(size = 16, colour = "black"),
+    #              axis.title.y = element_text(size = 18)) + 
+    #        xlab("Bootstrap differences") +
+    #        ylab("Deciles") +
+    #        #coord_cartesian(xlim = c(-1, 0.1)) +
+    #        coord_flip()
+    #    p
+    #})
+
+    #TAB 5
     output$Disp4Site <- renderPlotly({
         if (input$selectCompSite == "Montreal"){
             RefVSMeas = measuredT1_against_referenceT1(scans = Montreal)
@@ -748,7 +833,7 @@ server <- function(input, output) {
     #    ggplotly(multPlot)
     #})
     
-    #TAB 5
+    #TAB 6
     output$sdFilteredSites <- renderPlotly({
         sdFiltered_colors <- setNames(rainbow(nrow(sdFilteredSites$stdData)), sdFilteredSites$stdData$ID_Site)
         plot_ly(sdFilteredSites$stdData, x = ~reference, y = ~stdValues/reference, split = ~ID_Site, color = ~ID_Site, colors = sdFiltered_colors) %>%
@@ -764,7 +849,7 @@ server <- function(input, output) {
                    legend = list(title = list(text = "<b>Site ID</b>")))
     })
 
-    #TAB 6
+    #TAB 7
     #output$boxPlotLME <- renderPlotly({
     #    p <- ggplot(data = filter(sitesLMEM$dataLME, sid %in% input$boxPlotSite)) +
     #        geom_boxplot(aes(x = sphere, y = dataSphere, fill = factor(sphere))) +
