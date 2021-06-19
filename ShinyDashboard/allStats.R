@@ -4,6 +4,7 @@
 Sys.setenv(RETICULATE_MINICONDA_ENABLED = "FALSE")
 reticulate::source_python('nist.py')
 
+##PHANTOM DATASET##
 data <- read.csv("3T_NIST_T1maps_database.csv")
 data[] <- gsub("[][]", "", as.matrix(data))
 
@@ -117,3 +118,24 @@ source("linear_mixed_effects_model.R")
 
 sites <- 1:6
 sitesLMEM <- linear_mixed_effects_model(sites)
+
+##HUMAN DATASET##
+data2 <- read.csv("3T_human_T1maps_database.csv")
+data2[] <- gsub("[][]", "", as.matrix(data2))
+
+submissionHuman <- 1:56
+listHuman = list()
+list2appendHuman = list()
+for (i in submissionHuman){
+  for (j in seq(1,4)){
+    dataHuman = gsub("\\. ","",data2[i,j+grep("^T1...genu..WM.$", colnames(data2))-1])
+    dataHuman = as.matrix(as.numeric(unlist(strsplit(dataHuman," "))))
+    dataHuman = dataHuman[!is.na(dataHuman)]
+    
+    list2appendHuman[[j]] = dataHuman
+  }
+  listHuman[[i]] = list2appendHuman
+}
+
+##UNAM##
+dataUNAM <- 18:55
