@@ -33,5 +33,6 @@ getHumanData <- function(site){
       }
     }
   }
-  return(dataSite2plot_long)
+  returnHumanData <- list("dataLong_human" = dataSite2plot_long)
+  return(returnHumanData)
 }

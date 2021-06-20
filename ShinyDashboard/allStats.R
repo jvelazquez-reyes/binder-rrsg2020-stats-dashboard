@@ -139,3 +139,7 @@ for (i in submissionHuman){
 
 ##UNAM##
 dataUNAM <- 18:55
+
+source("getHumanData.R")
+
+sitesHuman <- getHumanData(dataUNAM)
