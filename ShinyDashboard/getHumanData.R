@@ -5,6 +5,7 @@ getHumanData <- function(site){
     id = data2[site[j],"id"]
     age = data2[site[j],"age"]
     sex = data2[site[j],"sex"]
+    vendor = data2[site[j],'MRI.vendor']
     #Find SID_Site
     #dumIndSite = intersect(site[j],labelSidSite[,1])
     #indFiltSite = match(dumIndSite,labelSidSite[,1])
@@ -17,8 +18,9 @@ getHumanData <- function(site){
       age_long <- as.matrix(rep(age,length(siteData)))
       sex_long <- as.matrix(rep(sex,length(siteData)))
       roi_long <- as.matrix(rep(k,length(siteData)))
+      vendor_long <-as.matrix(rep(vendor,length(siteData)))
       
-      data_Site_long <- data.frame(sid_long, age_long, sex_long, roi_long, siteData)
+      data_Site_long <- data.frame(sid_long, vendor_long, age_long, sex_long, roi_long, siteData)
       
       if (j==1 && flag==1){
         dataTmp_long = rbind(data.frame(), data_Site_long)

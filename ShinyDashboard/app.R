@@ -259,23 +259,34 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                 
                 #TAB 7
                 tabPanel("Human Dataset",
-                         sidebarLayout(
+                         tabsetPanel(sidebarLayout(
                              sidebarPanel(
-                                 selectizeInput(
-                                     inputId = "boxPlotSite", 
-                                     label = "Select a site", 
-                                     choices = unique(sitesLMEM$dataLME$sid),
-                                     #selected = "1.001",
-                                     multiple = FALSE
-                                 )
+                                 helpText("HUMAN DATASET")
                              ),
                              
                              mainPanel(
-                                 h3("Box plots"),
+                                 h3("ALL SITES"),
                                  plotlyOutput(outputId = "boxPlotHuman")
                              )
-                         ))
-                
+                        )),
+
+                         tabsetPanel(sidebarLayout(
+                             sidebarPanel(
+                                 selectInput(inputId = "selectMEXVendor",
+                                             label = "Choose an MRI Vendor:",
+                                             choices = c("Philips","GE"),
+                                             selected = "Philips")
+                             ),
+                             
+                             mainPanel(
+                                 h3("Mexico MRI vendor"),
+                                 plotlyOutput(outputId = "humanMEX_vendor"),
+                                 h3("Mexic all"),
+                                 plotlyOutput(outputId = "humanMEX_all")
+                             )
+                        )),
+                )
+
                 #TAB 8
                 #tabPanel("LMEM",
                 #         sidebarLayout(
@@ -760,7 +771,7 @@ server <- function(input, output) {
             theme(axis.line = element_line(colour = "black"), 
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
+                  panel.border = element_blank(),
                   panel.background = element_blank()) +
             theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                axis.title = element_text(size = 12),
@@ -885,6 +896,63 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                axis.title = element_text(size = 12),
                                axis.text = element_text(size = 12))
+        e <- p + geom_violin(width = 1.4) +
+            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4))
+        ggplotly(e, tooltip = "text")
+    })
+    
+    output$humanMEX_vendor <- renderPlotly({
+        if (input$selectMEXVendor == "Philips"){
+            dataMEX_vendor = subset(sitesHuman_Mexico$dataLong_human, as.character(vendor_long)=="Philips")
+        }
+        else if (input$selectMEXVendor == "GE"){
+            dataMEX_vendor = subset(sitesHuman_Mexico$dataLong_human, as.character(vendor_long)=="GE")
+        }
+        
+        p <- ggplot(data = dataMEX_vendor, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
+            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
+            scale_x_reverse() +
+            #scale_x_discrete(labels = c("14"="21.35","13"="30.32","12"="42.78","11"="60.06","10"="85.35",
+            #                              "9"="120.89","8"="174.70","7"="240.71","6"="341.99","5"="485.90",
+            #                              "4"="692.25","3"="994.84","2"="1342.53","1"="1911.16"))
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                                    axis.title = element_text(size = 12),
+                                    axis.text = element_text(size = 12))
+        e <- p + geom_violin(width = 1.4) +
+            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4))
+        ggplotly(e, tooltip = "text")
+    })
+    
+    output$humanMEX_all <- renderPlotly({
+        p <- ggplot(data = sitesHuman_Mexico$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
+            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
+            scale_x_reverse() +
+            #scale_x_discrete(labels = c("14"="21.35","13"="30.32","12"="42.78","11"="60.06","10"="85.35",
+            #                              "9"="120.89","8"="174.70","7"="240.71","6"="341.99","5"="485.90",
+            #                              "4"="692.25","3"="994.84","2"="1342.53","1"="1911.16"))
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                                    axis.title = element_text(size = 12),
+                                    axis.text = element_text(size = 12))
         e <- p + geom_violin(width = 1.4) +
             geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
             geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),

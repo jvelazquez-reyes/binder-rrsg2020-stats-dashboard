@@ -138,8 +138,10 @@ for (i in submissionHuman){
 }
 
 ##UNAM##
-dataUNAM <- 18:55
+dataHumanAll <- 1:56
+dataMexico <- 18:55
 
 source("getHumanData.R")
+sitesHuman <- getHumanData(dataHumanAll)
+sitesHuman_Mexico <- getHumanData(dataMexico)
 
-sitesHuman <- getHumanData(dataUNAM)
