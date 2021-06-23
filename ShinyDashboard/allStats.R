@@ -138,10 +138,20 @@ for (i in submissionHuman){
 }
 
 ##UNAM##
-dataHumanAll <- 1:56
-dataMexico <- 18:55
+dataHumanAll <- c(1:56)
+dataHumanMexico <- c(18:55)
+dataHumanCanada <- c(8,56)
+dataHumanUS <- c(1:7,9)
+dataHumanItaly <- c(10:14)
+dataHumanGermany <- c(16,17)
+dataHumanAustralia <- 15
 
 source("getHumanData.R")
 sitesHuman <- getHumanData(dataHumanAll)
-sitesHuman_Mexico <- getHumanData(dataMexico)
+sitesHuman_Mexico <- getHumanData(dataHumanMexico)
+sitesHuman_Canada <- getHumanData(dataHumanCanada)
+sitesHuman_US <- getHumanData(dataHumanUS)
+sitesHuman_Italy <- getHumanData(dataHumanItaly)
+sitesHuman_Germany <- getHumanData(dataHumanGermany)
+sitesHuman_Australia <- getHumanData(dataHumanAustralia)
 

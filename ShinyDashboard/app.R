@@ -281,8 +281,18 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                              mainPanel(
                                  h3("Mexico MRI vendor"),
                                  plotlyOutput(outputId = "humanMEX_vendor"),
-                                 h3("Mexic all"),
-                                 plotlyOutput(outputId = "humanMEX_all")
+                                 h3("Mexico all"),
+                                 plotlyOutput(outputId = "humanMEX_all"),
+                                 h3("Canada all"),
+                                 plotlyOutput(outputId = "humanCAN_all"),
+                                 h3("US all"),
+                                 plotlyOutput(outputId = "humanUS_all"),
+                                 h3("Italy all"),
+                                 plotlyOutput(outputId = "humanITA_all"),
+                                 h3("Germany all"),
+                                 plotlyOutput(outputId = "humanGER_all"),
+                                 h3("Australia all"),
+                                 plotlyOutput(outputId = "humanAUS_all")
                              )
                         )),
                 )
@@ -884,10 +894,6 @@ server <- function(input, output) {
         p <- ggplot(data = sitesHuman$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
         #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            scale_x_reverse() +
-            #scale_x_discrete(labels = c("14"="21.35","13"="30.32","12"="42.78","11"="60.06","10"="85.35",
-            #                              "9"="120.89","8"="174.70","7"="240.71","6"="341.99","5"="485.90",
-            #                              "4"="692.25","3"="994.84","2"="1342.53","1"="1911.16"))
             theme(axis.line = element_line(colour = "black"), 
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
@@ -916,10 +922,6 @@ server <- function(input, output) {
         p <- ggplot(data = dataMEX_vendor, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            scale_x_reverse() +
-            #scale_x_discrete(labels = c("14"="21.35","13"="30.32","12"="42.78","11"="60.06","10"="85.35",
-            #                              "9"="120.89","8"="174.70","7"="240.71","6"="341.99","5"="485.90",
-            #                              "4"="692.25","3"="994.84","2"="1342.53","1"="1911.16"))
             theme(axis.line = element_line(colour = "black"), 
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
@@ -941,10 +943,112 @@ server <- function(input, output) {
         p <- ggplot(data = sitesHuman_Mexico$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            scale_x_reverse() +
-            #scale_x_discrete(labels = c("14"="21.35","13"="30.32","12"="42.78","11"="60.06","10"="85.35",
-            #                              "9"="120.89","8"="174.70","7"="240.71","6"="341.99","5"="485.90",
-            #                              "4"="692.25","3"="994.84","2"="1342.53","1"="1911.16"))
+            #scale_x_discrete(labels = c("1"="Genu WM","2"="Splenium WM","3"="Deep GM","4"="Cortical GM")) +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                                    axis.title = element_text(size = 12),
+                                    axis.text = element_text(size = 12))
+        e <- p + geom_violin(width = 1.4) +
+            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4))
+        ggplotly(e, tooltip = "text")
+    })
+    
+    output$humanCAN_all <- renderPlotly({
+        p <- ggplot(data = sitesHuman_Canada$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
+            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                                    axis.title = element_text(size = 12),
+                                    axis.text = element_text(size = 12))
+        e <- p + geom_violin(width = 1.4) +
+            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4))
+        ggplotly(e, tooltip = "text")
+    })
+    
+    output$humanUS_all <- renderPlotly({
+        p <- ggplot(data = sitesHuman_US$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
+            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                                    axis.title = element_text(size = 12),
+                                    axis.text = element_text(size = 12))
+        e <- p + geom_violin(width = 1.4) +
+            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4))
+        ggplotly(e, tooltip = "text")
+    })
+    
+    output$humanITA_all <- renderPlotly({
+        p <- ggplot(data = sitesHuman_Italy$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
+            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                                    axis.title = element_text(size = 12),
+                                    axis.text = element_text(size = 12))
+        e <- p + geom_violin(width = 1.4) +
+            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4))
+        ggplotly(e, tooltip = "text")
+    })
+    
+    output$humanGER_all <- renderPlotly({
+        p <- ggplot(data = sitesHuman_Germany$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
+            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
+            theme(axis.line = element_line(colour = "black"), 
+                  panel.grid.major = element_blank(), 
+                  panel.grid.minor = element_blank(), 
+                  panel.border = element_blank(), 
+                  panel.background = element_blank()) +
+            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+                                    axis.title = element_text(size = 12),
+                                    axis.text = element_text(size = 12))
+        e <- p + geom_violin(width = 1.4) +
+            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4))
+        ggplotly(e, tooltip = "text")
+    })
+    
+    output$humanAUS_all <- renderPlotly({
+        p <- ggplot(data = sitesHuman_Australia$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
+            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
             theme(axis.line = element_line(colour = "black"), 
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
