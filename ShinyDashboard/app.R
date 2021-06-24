@@ -292,7 +292,9 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                  h3("Germany all"),
                                  plotlyOutput(outputId = "humanGER_all"),
                                  h3("Australia all"),
-                                 plotlyOutput(outputId = "humanAUS_all")
+                                 plotlyOutput(outputId = "humanAUS_all"),
+                                 h3("T1 value VS Age"),
+                                 plotlyOutput(outputId = "humanAge_all")
                              )
                         )),
                 )
@@ -1064,6 +1066,20 @@ server <- function(input, output) {
                                          '<br> SID: ', factor(sid_long))),
                         position = position_nudge(x=0.4))
         ggplotly(e, tooltip = "text")
+    })
+    
+    sitesHuman$dataLong_human$age_long=as.numeric(as.character(sitesHuman$dataLong_human$age_long))
+    output$humanAge_all <- renderPlotly({
+        #sdFiltered_colors <- setNames(rainbow(nrow(sdFilteredSites$stdData)), sdFilteredSites$stdData$ID_Site)
+        plot_ly(sitesHuman$dataLong_human[order(sitesHuman$dataLong_human$age_long),], x = ~age_long, y = ~siteData, split = ~roi_long) %>%
+            #group_by(sid) %>%
+            add_trace(type = 'scatter', mode = 'lines+markers',
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Site: ', sid_long,
+                                    '<br> ROI: ', roi_long,
+                                    '<br> T1 value: ', signif(siteData,5))) %>%
+            layout(xaxis = list(title = "Age (years)",categoryarray = ~names, categoryorder = "array"), yaxis = list(title = "Measured T1 value (ms)"),
+                   legend = list(title = list(text = "<b>ROI</b>")))
     })
     
     #TAB 8
