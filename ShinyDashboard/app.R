@@ -297,6 +297,24 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                  plotlyOutput(outputId = "humanAge_all")
                              )
                         )),
+                        
+                        tabsetPanel(sidebarLayout(
+                            sidebarPanel(
+                                selectizeInput(
+                                    inputId = "FiltHumanSitesID", 
+                                    label = "Select a site", 
+                                    choices = unique(dfmeanHuman$Site),
+                                    selected = unique(dfmeanHuman$Site),
+                                    multiple = TRUE
+                                )
+                            ),
+                            
+                            mainPanel(
+                                h3("Difference (%) with MEX as reference"),
+                                plotlyOutput(outputId = "CompHumanSites")
+                            )
+                        )
+                        )
                 )
 
                 #TAB 8
@@ -1080,6 +1098,20 @@ server <- function(input, output) {
                                     '<br> T1 value: ', signif(siteData,5))) %>%
             layout(xaxis = list(title = "Age (years)",categoryarray = ~names, categoryorder = "array"), yaxis = list(title = "Measured T1 value (ms)"),
                    legend = list(title = list(text = "<b>ROI</b>")))
+    })
+    
+    sitesHuman_colors <- setNames(rainbow(nrow(dfmeanHuman)), dfmeanHuman$Site)
+    output$CompHumanSites <- renderPlotly({
+        plot_ly(dfmeanHuman, x = ~roi_lab, y = ~dif, split = ~Site, color = ~Site, colors = sitesHuman_colors) %>%
+            filter(Site %in% input$FiltHumanSitesID) %>%
+            #group_by(sid) %>%
+            add_trace(type = 'scatter', mode = 'lines+markers',
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Site: ', Site,
+                                    '<br> Difference (%): ', signif(dif,4),
+                                    '<br> ROI: ', roi_lab)) %>%
+            layout(xaxis = list(title = "ROI"), yaxis = list(title = "T1 value (ms)"),
+                   legend = list(title = list(text = "<b>Site ID</b>")))
     })
     
     #TAB 8

@@ -154,4 +154,20 @@ sitesHuman_US <- getHumanData(dataHumanUS)
 sitesHuman_Italy <- getHumanData(dataHumanItaly)
 sitesHuman_Germany <- getHumanData(dataHumanGermany)
 sitesHuman_Australia <- getHumanData(dataHumanAustralia)
-
+listHumanData <- c(sitesHuman_Canada,sitesHuman_US,sitesHuman_Italy,sitesHuman_Germany,sitesHuman_Australia)
+labelHumanSite <- c("CAN-MEX","US-MEX","ITA-MEX","GER-MEX","AUS-MEX")
+labelHumanROI <- c("Genu WM","splenium WM","Deep GM","Cortical GM")
+for (ii in seq(1,length(listHumanData))){
+  for (jj in seq(1,4)){
+    refMEX = mean(subset(sitesHuman_Mexico$dataLong_human, roi_long==jj)$siteData)
+    curSite = mean(subset(listHumanData[ii]$dataLong_human, roi_long==jj)$siteData)
+    dfmeanHuman2 = data.frame(labelHumanSite[ii],jj,labelHumanROI[jj],100*(curSite-refMEX)/refMEX)
+    if (ii==1 && jj==1){
+      dfmeanHuman = dfmeanHuman2
+    }
+    else{
+      dfmeanHuman = rbind(dfmeanHuman,dfmeanHuman2)
+    }
+  }
+}
+colnames(dfmeanHuman) <- c('Site','roi_num','roi_lab','dif')
