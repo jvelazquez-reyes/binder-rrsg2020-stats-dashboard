@@ -895,7 +895,7 @@ server <- function(input, output) {
     
     #TAB 6
     output$sdFilteredSites <- renderPlotly({
-        sdFiltered_colors <- setNames(rainbow(nrow(sdFilteredSites$stdData)), sdFilteredSites$stdData$ID_Site)
+        sdFiltered_colors <- setNames(rainbow(length(filteredSites)), unique(sdFilteredSites$stdData$ID_Site))
         plot_ly(sdFilteredSites$stdData, x = ~reference, y = ~stdValues/reference, split = ~ID_Site, color = ~ID_Site, colors = sdFiltered_colors) %>%
             filter(sid %in% input$RefVSMeasID) %>%
             #group_by(sid) %>%
@@ -1100,7 +1100,7 @@ server <- function(input, output) {
                    legend = list(title = list(text = "<b>ROI</b>")))
     })
     
-    sitesHuman_colors <- setNames(rainbow(nrow(dfmeanHuman)), dfmeanHuman$Site)
+    sitesHuman_colors <- setNames(rainbow(length(listHumanData)), unique(dfmeanHuman$Site))
     output$CompHumanSites <- renderPlotly({
         plot_ly(dfmeanHuman, x = ~roi_lab, y = ~dif, split = ~Site, color = ~Site, colors = sitesHuman_colors) %>%
             filter(Site %in% input$FiltHumanSitesID) %>%
