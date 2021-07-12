@@ -370,7 +370,7 @@ server <- function(input, output) {
     })
     
     #TAB 2
-    MagCom_colors <- setNames(rainbow(nrow(magVScomp$dataMagComp)), magVScomp$dataMagComp$sid)
+    MagCom_colors <- setNames(rainbow(length(cases)), unique(magVScomp$dataMagComp$sid))
     output$MagComp <- renderPlotly({
         if (input$typeComparison == "Difference"){
             plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~diff, split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
@@ -484,7 +484,7 @@ server <- function(input, output) {
     })
 
     #TAB 3
-    sitesFiltered_colors <- setNames(rainbow(nrow(MeasSites$dataSite)), MeasSites$dataSite$ID_Site)
+    sitesFiltered_colors <- setNames(rainbow(length(filteredSites)), unique(MeasSites$dataSite$ID_Site))
     output$CompFiltSites <- renderPlotly({
         plot_ly(MeasSites$dataSite, x = ~refT1, y = ~Mean, split = ~ID_Site, color = ~ID_Site, colors = sitesFiltered_colors) %>%
             filter(Site %in% input$FiltSitesID) %>%
