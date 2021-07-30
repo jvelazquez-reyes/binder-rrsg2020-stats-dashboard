@@ -29,10 +29,12 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                               mainPanel(img(src='rrsg2020Repo.png', height="90%", width="90%", align = "center"))
                           ),
                           fluidPage(
-                              htmlOutput("overviewTxt3")
+                              htmlOutput("overviewTxt3"),
+                              mainPanel(img(src='dataChallenge.png', height="90%", width="90%", align = "center"))
                           ),
                           fluidPage(
-                              htmlOutput("overviewTxt4")
+                              htmlOutput("overviewTxt4"),
+                              mainPanel(img(src='generalDashboard.png', height="90%", width="90%", align = "center"))
                           )
                  ),
                  
@@ -354,19 +356,19 @@ server <- function(input, output) {
     
     #TAB 1
     output$overviewTxt1 <- renderUI({
-        a("Challenge pitch", href=paste("https://blog.ismrm.org/2019/12/12/reproducibility-challenge-2020-join-the-reproducible-research-and-quantitative-mr-study-groups-in-their-efforts-to-standardize-t1-mapping/"), target="_blank")
+        a(HTML("<font size=6>Challenge pitch</font></b>"), href=paste("https://blog.ismrm.org/2019/12/12/reproducibility-challenge-2020-join-the-reproducible-research-and-quantitative-mr-study-groups-in-their-efforts-to-standardize-t1-mapping/"), target="_blank")
     })
     
     output$overviewTxt2 <- renderUI({
-        a("GitHub repo", href=paste("https://github.com/rrsg2020/"), target="_blank")
+        a(HTML("<font size=6>GitHub repo</font></b>"), href=paste("https://github.com/rrsg2020/"), target="_blank")
     })
     
     output$overviewTxt3 <- renderUI({
-        a("Link to the data", href=paste("https://osf.io/ywc9g/"), target="_blank")
+        a(HTML("<font size=6>Dataset OSF</font></b>"), href=paste("https://osf.io/ywc9g/"), target="_blank")
     })
     
     output$overviewTxt4 <- renderUI({
-        a("General dashboard", href=paste("http://rrsg2020.herokuapp.com/"), target="_blank")
+        a(HTML("<font size=6>General dashboard</font></b>"), href=paste("http://rrsg2020.herokuapp.com/"), target="_blank")
     })
     
     #TAB 2
