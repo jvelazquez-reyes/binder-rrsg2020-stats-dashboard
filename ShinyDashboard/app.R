@@ -68,7 +68,7 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                           shinyjs::useShinyjs(),
                           sidebarLayout(
                               sidebarPanel(
-                                  radioButtons(inputId = "test22",
+                                  radioButtons(inputId = "radButtMagComp",
                                                label = "Compare Magnitude VS Complex Per Site or All Sites",
                                                choices = c("Per Site", "All Sites"),
                                                selected = "Per Site"),
@@ -77,7 +77,6 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                       inputId = "CorrSitesID", 
                                       label = "Select a site to show a dispersion plot", 
                                       choices = unique(magVScomp$dataCorr$sid),
-                                      #selected = "1.001",
                                       multiple = FALSE
                                   ),
                                   
@@ -401,16 +400,17 @@ server <- function(input, output) {
     })
     
     output$CorrMagComp <- renderPlotly({
-        p <- ggplot(data = filter(magVScomp$dataCorr, sid %in% input$CorrSitesID)) +
-            geom_point(aes(x = Complex, y = Magnitude,
-                           text = paste0('<br> Complex: ', signif(Complex,5),
-                                         '<br> Magnitude: ', signif(Magnitude,5),
-                                         '<br> Sphere: ', sph,
-                                         '<br> ID: ', sid)),
-                       color = "black", size = 1.5) +
+        p <- ggplot(data = filter(magVScomp$dataCorr, sid %in% input$CorrSitesID),
+                    aes(x = Complex, y = Magnitude,
+                        text = paste0('<br> Complex: ', signif(Complex,5),
+                                      '<br> Magnitude: ', signif(Magnitude,5),
+                                      '<br> Sphere: ', sph,
+                                      '<br> ID: ', sid)),
+                    color = "black", size = 1.5) +
+            geom_point() +
             labs(x = "Complex T1 value (ms)", y = "Magnitude T1 value (ms)") +
-            geom_smooth(aes(x = Complex, y = Magnitude), method = "lm", se = TRUE, color = "red", lwd = 0.5,
-                        text = paste('<br> Confidence intervals: ')) +
+            geom_smooth(aes(x = Complex, y = Magnitude), method = "lm", formula = y~x,
+                        se = FALSE, color = "red", lwd = 0.5) +
             geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
             theme(axis.line = element_line(colour = "black"), 
                   panel.grid.major = element_blank(), 
@@ -427,10 +427,10 @@ server <- function(input, output) {
     output$PearsonCorr <- renderTable(magVScomp$PearsonCorr)
     
     toListen <- reactive({
-        list(input$test22,input$CorrSitesID)
+        list(input$radButtMagComp,input$CorrSitesID)
     })
     observeEvent(toListen(), {
-        if(input$test22=="Per Site"){
+        if(input$radButtMagComp=="Per Site"){
             dataMagCompSphere = comparison_magnitude_complex(cases)
             
             
@@ -445,7 +445,7 @@ server <- function(input, output) {
                 corr_per_sphere$df[ii,3] = epi.ccc(data_per_sphere$magData,data_per_sphere$compData)[[1]][1]
             }
             
-        }else if(input$test22=="All Sites"){
+        }else if(input$radButtMagComp=="All Sites"){
             dataMagCompSphere = comparison_magnitude_complex(cases)
             DispersionAllPointsMagComp <- dataMagCompSphere$PearsonCorrSphere
             spheres = 1:14
@@ -459,13 +459,14 @@ server <- function(input, output) {
         }
         
         output$DispAllPointsMagComp <- renderPlotly({
-            p <- ggplot(data = DispersionAllPointsMagComp) +
-                geom_point(aes(x = compData, y = magData, color = sph_long,
-                               text = paste('<br> Magnitude: ', signif(magData,6),
-                                            '<br> Complex: ', signif(compData,6),
-                                            '<br> Sphere: ', sph_long,
-                                            '<br> ID: ', sid_long)),
-                           color = "black", size = 1.5) +
+            p <- ggplot(data = DispersionAllPointsMagComp,
+                        aes(x = compData, y = magData,
+                            text = paste('<br> Magnitude: ', signif(magData,6),
+                                         '<br> Complex: ', signif(compData,6),
+                                         '<br> Sphere: ', sph_long,
+                                         '<br> ID: ', sid_long)),
+                        color = "black", size = 1.5) +
+                geom_point() +
                 labs(x = "Complex T1 value (ms)", y = "Magnitude T1 value (ms)") +
                 geom_smooth(aes(x = compData, y = magData), method = "lm", formula = y~x,
                             se = FALSE, color = "red", lwd = 0.5) +

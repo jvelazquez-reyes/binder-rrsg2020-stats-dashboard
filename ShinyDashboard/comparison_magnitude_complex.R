@@ -67,7 +67,8 @@ comparison_magnitude_complex <- function(cases){
     
     ##CORRELATION ANALYSIS
     corrTest <- cor.test(meanMag[,j], meanComp[,j], method = 'pearson')
-    Pearson_test <- data.frame(id, corrTest$estimate, corrTest$p.value)
+    linTest <- epi.ccc(meanMag[,j], meanComp[,j])
+    Pearson_test <- data.frame(id, corrTest$estimate, linTest[[1]][1])
     
     #DIFFERENCE AND PERCENTAGE DIFFERENCE
     data_Mag_Comp <- data.frame(sid, sph, t1, diff_Mag_Comp[,j], diff_Perc_Mag_Comp[,j])
@@ -95,7 +96,7 @@ comparison_magnitude_complex <- function(cases){
   
   colnames(dataComparison) <- c('sid', 'sph', 'refT1', 'diff', 'percDiff')
   colnames(dataCorrelation) <- c('sid', 'sph', 'Magnitude', 'Complex')
-  colnames(dataPearson) <- c('Site', 'R', 'p-Value')
+  colnames(dataPearson) <- c('Site', 'Pearson', 'Lin')
   
   #Correlation coefficients per sphere
   for (ii in seq(1,length(spheres))){
