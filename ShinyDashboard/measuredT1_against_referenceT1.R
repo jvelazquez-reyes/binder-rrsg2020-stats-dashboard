@@ -92,7 +92,7 @@ measuredT1_against_referenceT1 <- function(scans){
   correlations2[1,1] = Pearson_test2
   correlations2[1,2] = Lin_test2[[1]][1]
   #correlations2[1,3] = icc_test[7]
-  colnames(correlations2) = c("R","Lin's Concordance")
+  colnames(correlations2) = c("Pearson","Lin")
   
   returnStats <- list("Correlation_coefficients" = correlations,
                       "BAData" = BAData,

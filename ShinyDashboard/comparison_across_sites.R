@@ -1,7 +1,7 @@
 comparison_across_sites <- function(site){
   meanSite = data.frame()
   matSpheres = matrix(0)
-  corr_per_sphere <- data.frame(Sphere=as.integer(), R=as.numeric())
+  corr_per_sphere <- data.frame(Sphere=as.integer(), Pearson=as.numeric())
   #spheres = whitelist$whitelists$`NIST spheres`$whitelist
   spheres = 1:14
   for (j in seq(1,length(site))){
@@ -73,7 +73,7 @@ comparison_across_sites <- function(site){
   for (ii in seq(1,length(spheres))){
     data_per_sphere = subset(dataSite2plot_long, sph_long == spheres[ii])
     corr_per_sphere[ii,1] = spheres[ii]
-    corr_per_sphere[ii,2] = cor(data_per_sphere$t1_long,data_per_sphere$siteData)
+    corr_per_sphere[ii,2] = signif(cor(data_per_sphere$t1_long,data_per_sphere$siteData),3)
   }
   
   ##ONE-WAY ANOVA##

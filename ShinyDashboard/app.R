@@ -435,7 +435,7 @@ server <- function(input, output) {
             
             
             spheres = 1:14
-            corr_per_sphere = reactiveValues(df = data.frame(Sphere=as.integer(), R=as.numeric(), Lin=as.numeric()))
+            corr_per_sphere = reactiveValues(df = data.frame(Sphere=as.integer(), Pearson=as.numeric(), Lin=as.numeric()))
                 
             DispersionAllPointsMagComp <- subset(dataMagCompSphere$PearsonCorrSphere, sid_long == input$CorrSitesID)
             for (ii in seq(1,length(spheres))){
@@ -519,12 +519,13 @@ server <- function(input, output) {
             DispersionAllPoints = SiteAustralia
         }
         
-        p <- ggplot(data = DispersionAllPoints$dataSite_long) +
-            geom_point(aes(x = t1_long, y = siteData, fill = ID_Site_long,
-                           text = paste('<br> Measured T1 Value: ', signif(siteData,6),
-                                        '<br> Reference T1 Value: ', signif(t1_long,6),
-                                        '<br> Sphere: ', sph_long)),
-                       color = "black", size = 1.5) +
+        p <- ggplot(data = DispersionAllPoints$dataSite_long,
+                    aes(x = t1_long, y = siteData, fill = ID_Site_long,
+                        text = paste('<br> Measured T1 Value: ', signif(siteData,6),
+                                     '<br> Reference T1 Value: ', signif(t1_long,6),
+                                     '<br> Sphere: ', sph_long)),
+                    color = "black", size = 1.5) +
+            geom_point() +
             labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
             geom_smooth(aes(x = t1_long, y = siteData), method = "lm", formula = y~x,
                         se = FALSE, color = "red", lwd = 0.5) +
@@ -560,12 +561,13 @@ server <- function(input, output) {
         
         AcErrorAllPoints = subset(AcErrorAllPoints$dataSite_long, ac_error <= input$errorThr[2])
         
-        p <- ggplot(data = AcErrorAllPoints) +
-            geom_point(aes(x = t1_long, y = ac_error, fill = ID_Site_long,
-                           text = paste('<br> Accuracy Error: ', signif(ac_error,3),
-                                        '<br> Reference T1 Value: ', signif(t1_long,6),
-                                        '<br> Sphere: ', sph_long)),
-                       color = "black", size = 1.5) +
+        p <- ggplot(data = AcErrorAllPoints,
+                    aes(x = t1_long, y = ac_error, fill = ID_Site_long,
+                        text = paste('<br> Accuracy Error: ', signif(ac_error,3),
+                                     '<br> Reference T1 Value: ', signif(t1_long,6),
+                                     '<br> Sphere: ', sph_long)),
+                    color = "black", size = 1.5) +
+            geom_point() +
             labs(x = "Reference T1 value (ms)", y = "Accuracy Error (%)") +
             theme(axis.line = element_line(colour = "black"), 
                   panel.grid.major = element_blank(), 
@@ -679,12 +681,13 @@ server <- function(input, output) {
             RefVSMeas = measuredT1_against_referenceT1(scans = Australia)
         }
  
-        p <- ggplot(data = RefVSMeas$BAData) +
-            geom_point(aes(x = reference, y = measValue, fill = ID_Site,
-                           text = paste('<br> Measured T1 Value: ', signif(measValue,6),
-                                        '<br> Reference T1 Value: ', signif(reference,6),
-                                        '<br> Sphere: ', sph)),
-                       color = "black", size = 1.5) +
+        p <- ggplot(data = RefVSMeas$BAData,
+                    aes(x = reference, y = measValue, fill = ID_Site,
+                        text = paste('<br> Measured T1 Value: ', signif(measValue,6),
+                                     '<br> Reference T1 Value: ', signif(reference,6),
+                                     '<br> Sphere: ', sph)),
+                    color = "black", size = 1.5) +
+            geom_point() +
             labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
             geom_smooth(aes(x = reference, y = measValue), method = "lm", formula = y~x,
                         se = FALSE, color = "red", lwd = 0.5) +
@@ -718,13 +721,14 @@ server <- function(input, output) {
             RefVSMeas = measuredT1_against_referenceT1(scans = Australia)
         }
         
-        p <- ggplot(data = RefVSMeas$BAData) +
-            geom_point(aes(x = average, y = perc_difference, fill = ID_Site,
-                           text = paste('<br> Difference (%): ', signif(perc_difference,4),
-                                        '<br> Average T1: ', signif(average,5),
-                                        '<BR> Reference T1: ', signif(reference,5),
-                                        '<br> Sphere: ', sph)), 
-                       pch = 1, size = 1.5, col = "black") +
+        p <- ggplot(data = RefVSMeas$BAData,
+                    aes(x = average, y = perc_difference, fill = ID_Site,
+                        text = paste('<br> Difference (%): ', signif(perc_difference,4),
+                                     '<br> Average T1: ', signif(average,5),
+                                     '<BR> Reference T1: ', signif(reference,5),
+                                     '<br> Sphere: ', sph)), 
+                    pch = 1, size = 1.5, col = "black") +
+            geom_point() +
             labs(x = "Average T1 (ms)", 
                  y = "Difference (%)") +
             xlim(200,2150) +
@@ -791,12 +795,13 @@ server <- function(input, output) {
             RefVSMeas = measuredT1_against_referenceT1(scans = Philips)
         }
         
-        p <- ggplot(data = RefVSMeas$BAData) +
-            geom_point(aes(x = reference, y = measValue, fill = ID_Vendor,
-                           text = paste('<br> Measured T1 Value: ', signif(measValue,6),
-                                        '<br> Reference T1 Value: ', signif(reference,6),
-                                        '<br> Sphere: ', sph)),
-                       color = "black", size = 1.5) +
+        p <- ggplot(data = RefVSMeas$BAData,
+                    aes(x = reference, y = measValue, fill = ID_Vendor,
+                        text = paste('<br> Measured T1 Value: ', signif(measValue,6),
+                                     '<br> Reference T1 Value: ', signif(reference,6),
+                                     '<br> Sphere: ', sph)),
+                    color = "black", size = 1.5) +
+            geom_point() +
             labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
             geom_smooth(aes(x = reference, y = measValue), method = "lm", formula = y~x,
                         se = FALSE, color = "red", lwd = 0.5) +
@@ -824,13 +829,14 @@ server <- function(input, output) {
             RefVSMeas = measuredT1_against_referenceT1(scans = Philips)
         }
         
-        p <- ggplot(data = RefVSMeas$BAData) +
-            geom_point(aes(x = average, y = perc_difference, fill = ID_Vendor,
-                           text = paste('<br> Difference (%): ', signif(perc_difference,4),
-                                        '<br> Average T1: ', signif(average,5),
-                                        '<BR> Reference T1: ', signif(reference,5),
-                                        '<br> Sphere: ', sph)), 
-                       pch = 1, size = 1.5, col = "black") +
+        p <- ggplot(data = RefVSMeas$BAData,
+                    aes(x = average, y = perc_difference, fill = ID_Vendor,
+                        text = paste('<br> Difference (%): ', signif(perc_difference,4),
+                                     '<br> Average T1: ', signif(average,5),
+                                     '<BR> Reference T1: ', signif(reference,5),
+                                     '<br> Sphere: ', sph)), 
+                    pch = 1, size = 1.5, col = "black") +
+            geom_point() +
             labs(x = "Average T1 (ms)", 
                  y = "Difference (%)") +
             xlim(200,2150) +
