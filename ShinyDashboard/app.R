@@ -931,8 +931,8 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                axis.title = element_text(size = 12),
                                axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 1.4) +
-            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+        e <- p + geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
             geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
                                          '<br> ROI: ', roi_long,
                                          '<br> SID: ', factor(sid_long))),
@@ -959,8 +959,8 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 1.4) +
-            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+        e <- p + geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
             geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
                                          '<br> ROI: ', roi_long,
                                          '<br> SID: ', factor(sid_long))),
@@ -981,8 +981,8 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 1.4) +
-            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+        e <- p + geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
             geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
                                          '<br> ROI: ', roi_long,
                                          '<br> SID: ', factor(sid_long))),
@@ -1002,8 +1002,8 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 1.4) +
-            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+        e <- p + geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
             geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
                                          '<br> ROI: ', roi_long,
                                          '<br> SID: ', factor(sid_long))),
@@ -1023,8 +1023,8 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 1.4) +
-            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+        e <- p + geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
             geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
                                          '<br> ROI: ', roi_long,
                                          '<br> SID: ', factor(sid_long))),
@@ -1044,8 +1044,8 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 1.4) +
-            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+        e <- p + geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
             geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
                                          '<br> ROI: ', roi_long,
                                          '<br> SID: ', factor(sid_long))),
@@ -1065,8 +1065,8 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 1.4) +
-            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+        e <- p + geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
             geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
                                          '<br> ROI: ', roi_long,
                                          '<br> SID: ', factor(sid_long))),
@@ -1086,8 +1086,8 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 1.4) +
-            geom_boxplot(width = 0.1, color="grey", alpha=0.2) +
+        e <- p + geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
             geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
                                          '<br> ROI: ', roi_long,
                                          '<br> SID: ', factor(sid_long))),
