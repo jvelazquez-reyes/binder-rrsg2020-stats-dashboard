@@ -920,24 +920,45 @@ server <- function(input, output) {
 
     #TAB 7
     output$boxPlotHuman <- renderPlotly({
-        p <- ggplot(data = sitesHuman$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+        p <- plot_ly(sitesHuman$dataLong_human, x = ~roi_long, y = ~siteData, split = ~roi_long,
+                     type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE), points = 'all'
+                     ) %>%
+            add_trace(hoverinfo = 'text',
+                      text = ~paste0('<br> Measured value: ', signif(siteData,5),
+                                    '<br>ROI: ', roi_long,
+                                    '<br>SID: ', factor(sid_long)), hoveron = 'points')
+        #p <- p %>% layout(hovermode = "x unified")
+            #         text = ~paste('</br> Measured value: ', signif(siteData,5),
+            #                       '</br> ROI: ', roi_long,
+            #                       '</br> SID: ', factor(sid_long)))
+        #p <- ggplot(data = sitesHuman$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            #geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha = .8) +
+            #geom_point(aes(y = siteData, color = factor(roi_long)),
+            #           position = position_jitter(width = .15), size = .5, alpha = 0.8) +
+            #geom_boxplot(width = .1, guides = FALSE, outlier.shape = NA, alpha = 0.5) +
+            #geom_boxplot(data = sitesHuman$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long),
+            #                                                   text = paste('<br> Measured Value: ', signif(siteData,5),
+            #                                                                '<br> ROI: ', roi_long,
+            #                                                                '<br> SID: ', factor(sid_long))),
+            #             position = position_nudge(x=0.4),
+            #             width = 0.5, color="grey", alpha=0.2) +
+            #geom_jitter(data = sitesHuman$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long),
+            #                                                  text = paste('<br> Measured Value: ', signif(siteData,5),
+            #                                                               '<br> ROI: ', roi_long,
+            #                                                               '<br> SID: ', factor(sid_long))),
+            #            position = position_nudge(x=0.4)) +
         #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4))
-        ggplotly(e, tooltip = "text")
+            #labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
+            #theme(axis.line = element_line(colour = "black"), 
+            #      panel.grid.major = element_blank(), 
+            #      panel.grid.minor = element_blank(), 
+            #      panel.border = element_blank(), 
+            #      panel.background = element_blank()) +
+            #theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+            #                   axis.title = element_text(size = 12),
+            #                   axis.text = element_text(size = 12))
+        #ggplotly(p, tooltip = "text")
+        p
     })
     
     output$humanMEX_vendor <- renderPlotly({
@@ -949,6 +970,12 @@ server <- function(input, output) {
         }
         
         p <- ggplot(data = dataMEX_vendor, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4)) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
             theme(axis.line = element_line(colour = "black"), 
@@ -959,17 +986,17 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4))
-        ggplotly(e, tooltip = "text")
+        ggplotly(p, tooltip = "text")
     })
     
     output$humanMEX_all <- renderPlotly({
         p <- ggplot(data = sitesHuman_Mexico$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4)) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
             #scale_x_discrete(labels = c("1"="Genu WM","2"="Splenium WM","3"="Deep GM","4"="Cortical GM")) +
@@ -981,17 +1008,17 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4))
-        ggplotly(e, tooltip = "text")
+        ggplotly(p, tooltip = "text")
     })
     
     output$humanCAN_all <- renderPlotly({
         p <- ggplot(data = sitesHuman_Canada$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4)) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
             theme(axis.line = element_line(colour = "black"), 
@@ -1002,17 +1029,17 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4))
-        ggplotly(e, tooltip = "text")
+        ggplotly(p, tooltip = "text")
     })
     
     output$humanUS_all <- renderPlotly({
         p <- ggplot(data = sitesHuman_US$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4)) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
             theme(axis.line = element_line(colour = "black"), 
@@ -1023,17 +1050,17 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4))
-        ggplotly(e, tooltip = "text")
+        ggplotly(p, tooltip = "text")
     })
     
     output$humanITA_all <- renderPlotly({
         p <- ggplot(data = sitesHuman_Italy$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4)) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
             theme(axis.line = element_line(colour = "black"), 
@@ -1044,17 +1071,17 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4))
-        ggplotly(e, tooltip = "text")
+        ggplotly(p, tooltip = "text")
     })
     
     output$humanGER_all <- renderPlotly({
         p <- ggplot(data = sitesHuman_Germany$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4)) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
             theme(axis.line = element_line(colour = "black"), 
@@ -1065,17 +1092,17 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4))
-        ggplotly(e, tooltip = "text")
+        ggplotly(p, tooltip = "text")
     })
     
     output$humanAUS_all <- renderPlotly({
         p <- ggplot(data = sitesHuman_Australia$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
+            geom_violin(width = 0.5) +
+            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
+            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
+                                         '<br> ROI: ', roi_long,
+                                         '<br> SID: ', factor(sid_long))),
+                        position = position_nudge(x=0.4)) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
             labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
             theme(axis.line = element_line(colour = "black"), 
@@ -1086,13 +1113,7 @@ server <- function(input, output) {
             theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
                                     axis.title = element_text(size = 12),
                                     axis.text = element_text(size = 12))
-        e <- p + geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4))
-        ggplotly(e, tooltip = "text")
+        ggplotly(p, tooltip = "text")
     })
     
     sitesHuman$dataLong_human$age_long=as.numeric(as.character(sitesHuman$dataLong_human$age_long))
