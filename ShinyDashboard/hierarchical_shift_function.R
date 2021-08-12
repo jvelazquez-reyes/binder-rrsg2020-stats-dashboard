@@ -13,7 +13,7 @@ hierarchical_shift_function <- function(dataSites){
     np = 20
     qseq <- seq(0.1,0.9,0.1) # quantiles
     alpha <- 0.05
-    nboot <- 1000 # bootstrap
+    nboot <- 500 # bootstrap
     tr <- 0.2 # group trimmed mean for each quantile
     nq <- length(qseq)
     icrit <- round((1-alpha)*nboot) # 95th quantile
@@ -56,7 +56,7 @@ hierarchical_shift_function <- function(dataSites){
       scale_colour_viridis_d(option = "B") +
       scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
       scale_y_continuous(limits = c(-300,300), breaks = seq(-300,300,50)) +
-      ggtitle(paste("Reference Temperature (ms): ", signif(tempTitle[sph],5))) +
+      ggtitle(paste("Reference T1 (ms): ", signif(tempTitle[sph],5))) +
       theme(legend.position = "none",
             plot.title = element_text(size=18),
             axis.title.x = element_text(size = 18),
@@ -120,7 +120,7 @@ hierarchical_shift_function <- function(dataSites){
       scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
       scale_y_continuous(limits = c(-300,300), breaks = seq(-300,300,50)) +
       # coord_cartesian(ylim = c(-500, 700)) +
-      ggtitle(paste("Reference Temperature (ms): ", signif(tempTitle[sph],5))) +
+      ggtitle(paste("Reference T1 (ms): ", signif(tempTitle[sph],5))) +
       theme(legend.position = "none",
             plot.title = element_text(size=18),
             axis.title.x = element_text(size = 18),
