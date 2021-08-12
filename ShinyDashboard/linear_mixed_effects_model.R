@@ -2,6 +2,7 @@ linear_mixed_effects_model <- function(sites){
   ##Data in long format
   data <- read.csv("3T_NIST_T1maps_database.csv")
   data[] <- gsub("[][]", "", as.matrix(data))
+  colnames(data)[1] <- gsub('^...','',colnames(data)[1])
   
   listSpheres = list()
   list2append = list()

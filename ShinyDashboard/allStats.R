@@ -7,8 +7,9 @@ reticulate::source_python('nist.py')
 ##PHANTOM DATASET##
 data <- read.csv("3T_NIST_T1maps_database.csv")
 data[] <- gsub("[][]", "", as.matrix(data))
+colnames(data)[1] <- gsub('^...','',colnames(data)[1])
 
-submission <- 1:40
+submission <- 1:38
 listSpheres = list()
 list2append = list()
 for (i in submission){
@@ -25,14 +26,14 @@ for (i in submission){
 ##COMPARE MAGNITUDE VS COMPLEX##
 source("comparison_magnitude_complex.R")
 
-cases <- c(1,seq(11,25,2),34,36)
+cases <- c(1,seq(11,25,2),32,34)
 
 #p-value > 0.5, there's no statistical difference between magnitude and complex
 magVScomp <- comparison_magnitude_complex(cases)
 
 #Germany <- 13:26
-#Montreal <- c(4,11,12,27:30,40)
-#US <- c(3,5:10,32:39)
+#Montreal <- c(4,11,12,27:30,38)
+#US <- c(3,5:10,32:37)
 #London <- 1:2
 #Australia <- 31
 #id = data[scans[j],"id"]
@@ -42,8 +43,8 @@ whitelist <- fromJSON(file = "NIST_whitelists.json")
 
 ##FILTER PER SITE
 allLondon <- c(1.001,1.002)
-allUS <- c(2.001,4.001,4.002,4.003,4.004,4.005,4.006,10.001,10.002,11.001,11.002,11.003,11.004,12.001,12.002)
-allMontreal <- c(3.001,5.001,5.002,7.001,7.002,8.001,8.002,13.001)
+allUS <- c(2.001,4.001,4.002,4.003,4.004,4.005,4.006,10.001,10.002,10.003,10.004,11.001,11.002)
+allMontreal <- c(3.001,5.001,5.002,7.001,7.002,8.001,8.002,12.001)
 allGermany <- c(6.001,6.002,6.003,6.004,6.005,6.006,6.007,6.008,6.009,6.010,6.011,6.012,6.013,6.014)
 allAustralia <- c(9.001)
 
@@ -70,8 +71,8 @@ for (ii in seq(1,length(filteredSites))){
 }
 
 ##FILTER PER MRI VENDOR##
-allSiemens <- c(1.001,1.002,2.001,3.001,8.001,8.002,9.001,10.001,10.002,12.001,12.002,13.001)
-allGE <- c(4.001,4.002,4.003,4.004,4.005,4.006,11.001,11.002,11.003,11.004)
+allSiemens <- c(1.001,1.002,2.001,3.001,8.001,8.002,9.001,11.001,11.002,12.001)
+allGE <- c(4.001,4.002,4.003,4.004,4.005,4.006,10.001,10.002,10.003,10.004)
 allPhilips <- c(5.001,5.002,6.001,6.002,6.003,6.004,6.005,6.006,6.007,6.008,6.009,6.010,6.011,
                 6.012,6.013,6.014,7.001,7.002)
 
