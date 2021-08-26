@@ -977,15 +977,12 @@ server <- function(input, output) {
                                          '<br> SID: ', factor(sid_long))),
                         position = position_nudge(x=0.4)) +
             #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
+            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", shape = "SID") +
             theme(axis.line = element_line(colour = "black"), 
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
                   panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                                    axis.title = element_text(size = 12),
-                                    axis.text = element_text(size = 12))
+                  panel.background = element_blank())
         ggplotly(p, tooltip = "text")
     })
     
@@ -1004,10 +1001,7 @@ server <- function(input, output) {
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
                   panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                                    axis.title = element_text(size = 12),
-                                    axis.text = element_text(size = 12))
+                  panel.background = element_blank())
         ggplotly(p, tooltip = "text")
     })
     
@@ -1025,10 +1019,7 @@ server <- function(input, output) {
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
                   panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                                    axis.title = element_text(size = 12),
-                                    axis.text = element_text(size = 12))
+                  panel.background = element_blank())
         ggplotly(p, tooltip = "text")
     })
     
@@ -1046,10 +1037,7 @@ server <- function(input, output) {
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
                   panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                                    axis.title = element_text(size = 12),
-                                    axis.text = element_text(size = 12))
+                  panel.background = element_blank())
         ggplotly(p, tooltip = "text")
     })
     
@@ -1067,10 +1055,7 @@ server <- function(input, output) {
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
                   panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                                    axis.title = element_text(size = 12),
-                                    axis.text = element_text(size = 12))
+                  panel.background = element_blank())
         ggplotly(p, tooltip = "text")
     })
     
@@ -1088,10 +1073,7 @@ server <- function(input, output) {
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
                   panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                                    axis.title = element_text(size = 12),
-                                    axis.text = element_text(size = 12))
+                  panel.background = element_blank())
         ggplotly(p, tooltip = "text")
     })
     
@@ -1109,10 +1091,7 @@ server <- function(input, output) {
                   panel.grid.major = element_blank(), 
                   panel.grid.minor = element_blank(), 
                   panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                                    axis.title = element_text(size = 12),
-                                    axis.text = element_text(size = 12))
+                  panel.background = element_blank())
         ggplotly(p, tooltip = "text")
     })
     

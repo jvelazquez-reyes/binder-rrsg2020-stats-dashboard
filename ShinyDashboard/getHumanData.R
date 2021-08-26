@@ -1,5 +1,6 @@
 getHumanData <- function(site){
   rois = 1:4
+  labelHumanROI <- c("Genu WM","splenium WM","Deep GM","Cortical GM")
   for (j in seq(1,length(site))){
     flag=1
     id = data2[site[j],"id"]
@@ -9,9 +10,11 @@ getHumanData <- function(site){
     #Find SID_Site
     #dumIndSite = intersect(site[j],labelSidSite[,1])
     #indFiltSite = match(dumIndSite,labelSidSite[,1])
-    for (k in rois){
+    cnt_roi = 1
+    for (k in labelHumanROI){
       #rowIndex = match(site[j],as.numeric(data2[,"id"]))
-      siteData = as.numeric(unlist(listHuman[[site[j]]][k]))
+      siteData = as.numeric(unlist(listHuman[[site[j]]][rois[cnt_roi]]))
+      cnt_roi = cnt_roi + 1
       
       #Pixelwise
       sid_long <- as.matrix(rep(id,length(siteData)))
