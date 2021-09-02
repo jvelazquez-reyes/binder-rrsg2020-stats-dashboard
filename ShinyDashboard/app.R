@@ -380,10 +380,12 @@ server <- function(input, output) {
                 add_trace(type = 'scatter', mode = 'lines+markers',
                           hoverinfo = 'text',
                           text = ~paste('<br> Site: ', sid,
-                                        '<br> Difference: ', signif(diff,3),
-                                        '<br> Sphere: ', sph)) %>%
-                layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "Absolute difference (ms)"),
-                       legend = list(title = list(text = "<b>Site ID</b>")))
+                                        '<br> Difference (ms): ', signif(diff,3),
+                                        '<br> Reference T1 (ms): ', signif(refT1,5))) %>%
+                layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                       yaxis = list(title=list(text="Absolute difference (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                    range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[4]+5)),
+                       legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95))
         }
         else if (input$typeComparison == "Difference (%)"){
             plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~percDiff, split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
@@ -393,9 +395,11 @@ server <- function(input, output) {
                           hoverinfo = 'text',
                           text = ~paste('<br> Site: ', sid,
                                         '<br> Difference (%): ', signif(percDiff,4),
-                                        '<br> Sphere: ', sph)) %>%
-                layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "Percentage difference (%)"),
-                       legend = list(title = list(text = "<b>Site ID</b>")))
+                                        '<br> Reference T1 (ms): ', signif(refT1,5))) %>%
+                layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                       yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                    range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[5]+5)),
+                       legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95))
         }
     })
     
