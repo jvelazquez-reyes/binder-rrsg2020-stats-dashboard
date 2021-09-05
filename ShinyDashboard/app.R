@@ -62,7 +62,8 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                                   #h5("If site 1.001 is selected, sites 1.001 and 1.002 are actually being compared, where
                                   #1.001 - Magnitude data and 1.002 - Complex data. One more example, 6.009 - Magnitude data
                                   #   and 6.010 - Complex data."),
-                                  plotlyOutput(outputId = "MagComp")
+                                  plotlyOutput(outputId = "MagComp"),
+                                  plotlyOutput(outputId = "BAMagComp")
                               )
                           ),
                           shinyjs::useShinyjs(),
@@ -374,58 +375,114 @@ server <- function(input, output) {
     MagCom_colors <- setNames(rainbow(length(cases)), unique(magVScomp$dataMagComp$sid))
     output$MagComp <- renderPlotly({
         if (input$typeComparison == "Difference"){
-            plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~diff, split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
+            plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~abs(diff), split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
                 filter(sid %in% input$DiffSitesID) %>%
                 #group_by(sid) %>%
                 add_trace(type = 'scatter', mode = 'lines+markers',
                           hoverinfo = 'text',
                           text = ~paste('<br> Site: ', sid,
-                                        '<br> Difference (ms): ', signif(diff,3),
+                                        '<br> Difference (ms): ', signif(abs(diff),3),
                                         '<br> Reference T1 (ms): ', signif(refT1,5))) %>%
                 layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
                        yaxis = list(title=list(text="Absolute difference (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                                    range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[4]+5)),
+                                    range=list(0,unname(apply(abs(magVScomp$dataMagComp),2,max))[4]+5)),
                        legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95))
         }
         else if (input$typeComparison == "Difference (%)"){
-            plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~percDiff, split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
+            plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~abs(percDiff), split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
                 filter(sid %in% input$DiffSitesID) %>%
                 #group_by(sid) %>%
                 add_trace(type = 'scatter', mode = 'lines+markers',
                           hoverinfo = 'text',
                           text = ~paste('<br> Site: ', sid,
-                                        '<br> Difference (%): ', signif(percDiff,4),
+                                        '<br> Difference (%): ', signif(abs(percDiff),4),
                                         '<br> Reference T1 (ms): ', signif(refT1,5))) %>%
                 layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
                        yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                                    range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[5]+5)),
+                                    range=list(0,unname(apply(abs(magVScomp$dataMagComp),2,max))[5]+5)),
                        legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95))
         }
     })
     
-    output$CorrMagComp <- renderPlotly({
-        p <- ggplot(data = filter(magVScomp$dataCorr, sid %in% input$CorrSitesID),
-                    aes(x = Complex, y = Magnitude,
-                        text = paste0('<br> Complex: ', signif(Complex,5),
-                                      '<br> Magnitude: ', signif(Magnitude,5),
-                                      '<br> Sphere: ', sph,
-                                      '<br> ID: ', sid)),
-                    color = "black", size = 1.5) +
-            geom_point() +
-            labs(x = "Complex T1 value (ms)", y = "Magnitude T1 value (ms)") +
-            geom_smooth(aes(x = Complex, y = Magnitude), method = "lm", formula = y~x,
-                        se = FALSE, color = "red", lwd = 0.5) +
-            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
+    output$BAMagComp <- renderPlotly({
+        plot_ly(magVScomp$dataMagComp) %>%
+            add_trace(magVScomp$dataMagComp, x = ~average, y = ~percDiff, color = ~as.factor(sid), 
+                      colors = MagCom_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Difference (%): ', signif(percDiff,4),
+                                    '<br> Average T1: ', signif(average,5),
+                                    '<BR> Reference T1: ', signif(refT1,5),
+                                    '<br> ID: ', sid)) %>%
+            layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100)),
+                   yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(unname(apply(magVScomp$dataMagComp,2,min))[5]-20,unname(apply(magVScomp$dataMagComp,2,max))[5]+20)),
+                   legend = list(title=list(text="<b>Site ID</b>"))) %>%
+            add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100), y = mean(magVScomp$dataMagComp$percDiff),
+                      type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
+                      showlegend = FALSE, hoverinfo = "none") %>%
+            add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+                      y = mean(magVScomp$dataMagComp$percDiff) + 1.96*sd(magVScomp$dataMagComp$percDiff),
+                      type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                      showlegend = FALSE, hoverinfo = "none") %>%
+            add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+                      y = mean(magVScomp$dataMagComp$percDiff) - 1.96*sd(magVScomp$dataMagComp$percDiff),
+                      type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                      showlegend = FALSE, hoverinfo = "none") %>%
+            layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff)-10,
+                                      text=paste("Mean = ",signif(mean(magVScomp$dataMagComp$percDiff),3)),
+                                      showarrow = FALSE, font = list(size=12, color="black"))) %>%
+            layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff) + 1.96*sd(magVScomp$dataMagComp$percDiff) + 10,
+                                      text=paste("Mean+1.96SD = ",signif(mean(magVScomp$dataMagComp$percDiff)+1.96*sd(magVScomp$dataMagComp$percDiff),3)),
+                                      showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
+            layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff) - 1.96*sd(magVScomp$dataMagComp$percDiff) - 10,
+                                      text=paste("Mean-1.96SD = ",signif(mean(magVScomp$dataMagComp$percDiff)-1.96*sd(magVScomp$dataMagComp$percDiff),3)),
+                                      showarrow = FALSE, font = list(size=12, color="firebrick")))
         
-        ggplotly(p, tooltip = "text")
+    })
+    
+    sphere_colors <- setNames(rainbow(14), unique(signif(magVScomp$dataCorr$refT1,5)))
+    output$CorrMagComp <- renderPlotly({
+        plotly_plot <- plot_ly(magVScomp$dataCorr) %>%
+            filter(sid %in% input$CorrSitesID) %>%
+            add_trace(magVScomp$dataCorr, x = ~Complex, y = ~Magnitude, color = ~as.factor(signif(refT1,5)), 
+                      colors = sphere_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Complex (ms): ', signif(Complex,5),
+                                    '<br> Magnitude (ms): ', signif(Magnitude,5),
+                                    '<br> Reference T1 (ms): ', signif(refT1,5),
+                                    '<br> ID: ', sid)) %>%
+            layout(xaxis = list(title=list(text="Complex T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,unname(apply(magVScomp$dataCorr,2,max))[5]+100)),
+                   yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,unname(apply(magVScomp$dataCorr,2,max))[4]+100)),
+                   legend = list(title=list(text="<b>Reference T1 (ms)</b>"))) %>%
+            add_trace(x = c(0, unname(apply(magVScomp$dataCorr,2,max))[5]+100), y = c(0, unname(apply(magVScomp$dataCorr,2,max))[4]+100),
+                      type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
+        #suppressWarnings(print(plotly_plot))
+        #p <- ggplot(data = filter(magVScomp$dataCorr, sid %in% input$CorrSitesID),
+        #            aes(x = Complex, y = Magnitude, color = as.factor(signif(refT1,5)),
+        #                text = paste0('<br> Complex (ms): ', signif(Complex,5),
+        #                              '<br> Magnitude (ms): ', signif(Magnitude,5),
+        #                              '<br> Reference T1 (ms): ', signif(refT1,5),
+        #                              '<br> ID: ', sid)),
+        #            color = "black", size = 1.5) +
+        #    geom_point() +
+        #    labs(x = "Complex T1 value (ms)", y = "Magnitude T1 value (ms)") +
+        #    geom_smooth(aes(x = Complex, y = Magnitude), method = "lm", formula = y~x,
+        #                se = FALSE, color = "red", lwd = 0.5) +
+        #    geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
+        #    theme(axis.line = element_line(colour = "black"), 
+        #          panel.grid.major = element_blank(), 
+        #          panel.grid.minor = element_blank(), 
+        #          panel.border = element_blank(), 
+        #          panel.background = element_blank()) +
+        #    theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        #                       axis.title = element_text(size = 12),
+        #                       axis.text = element_text(size = 12),
+        #                       panel.border = element_rect(colour = "black", fill=NA, size=1))
+        #p <- p + guides(fill=guide_legend(title="Reference T1 (ms)"))
+        #ggplotly(p, tooltip = "text")
     })
     
     output$PearsonCorr <- renderTable(magVScomp$PearsonCorr)
@@ -463,28 +520,22 @@ server <- function(input, output) {
         }
         
         output$DispAllPointsMagComp <- renderPlotly({
-            p <- ggplot(data = DispersionAllPointsMagComp,
-                        aes(x = compData, y = magData,
-                            text = paste('<br> Magnitude: ', signif(magData,6),
-                                         '<br> Complex: ', signif(compData,6),
-                                         '<br> Sphere: ', sph_long,
-                                         '<br> ID: ', sid_long)),
-                        color = "black", size = 1.5) +
-                geom_point() +
-                labs(x = "Complex T1 value (ms)", y = "Magnitude T1 value (ms)") +
-                geom_smooth(aes(x = compData, y = magData), method = "lm", formula = y~x,
-                            se = FALSE, color = "red", lwd = 0.5) +
-                geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
-                theme(axis.line = element_line(colour = "black"), 
-                      panel.grid.major = element_blank(), 
-                      panel.grid.minor = element_blank(), 
-                      panel.border = element_blank(), 
-                      panel.background = element_blank()) +
-                theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                                   axis.title = element_text(size = 12),
-                                   axis.text = element_text(size = 12))
-            p <- p + guides(fill=guide_legend(title="Site ID"))
-            ggplotly(p, tooltip = "text")
+            plot_ly(DispersionAllPointsMagComp) %>%
+                add_trace(DispersionAllPointsMagComp, x = ~compData, y = ~magData, color = ~as.factor(signif(refT1_long,5)), 
+                          colors = sphere_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                          hoverinfo = 'text',
+                          text = ~paste('<br> Complex (ms): ', signif(compData,5),
+                                        '<br> Magnitude (ms): ', signif(magData,5),
+                                        '<br> Reference T1 (ms): ', signif(refT1_long,5),
+                                        '<br> ID: ', sid_long)) %>%
+                layout(xaxis = list(title=list(text="Complex T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                    range=list(0,unname(apply(DispersionAllPointsMagComp,2,max))[5]+100)),
+                       yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                    range=list(0,unname(apply(DispersionAllPointsMagComp,2,max))[4]+100)),
+                       legend = list(title=list(text="<b>Reference T1 (ms)</b>"))) %>%
+                #,shapes=list(type="line", X0=0, x1=500, y0=0, y1=500))
+                add_trace(x = c(0, unname(apply(DispersionAllPointsMagComp,2,max))[5]+100), y = c(0, unname(apply(DispersionAllPointsMagComp,2,max))[4]+100),
+                          type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
         })
         
         output$PearsonMagCompPerSphere <- renderTable({corr_per_sphere$df})
