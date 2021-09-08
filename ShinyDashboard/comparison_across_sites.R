@@ -1,5 +1,6 @@
 comparison_across_sites <- function(site){
   meanSite = data.frame()
+  sdSite = data.frame()
   matSpheres = matrix(0)
   corr_per_sphere <- data.frame(Sphere=as.integer(), Pearson=as.numeric())
   #spheres = whitelist$whitelists$`NIST spheres`$whitelist
@@ -19,8 +20,9 @@ comparison_across_sites <- function(site){
       phantomVersion = as.numeric(data[rowIndex,"phantom.version"])
       refT1 = temperature_correction(phantomTemperature,phantomVersion)
       
-      #For entire slice
+      #For non-voxelwise
       meanSite[numSpheres,j] = mean(siteData)
+      sdSite[numSpheres,j] = sd(siteData)
       
       #Pixelwise
       sid_long <- as.matrix(rep(id,length(siteData)))
@@ -49,13 +51,13 @@ comparison_across_sites <- function(site){
       numSpheres = numSpheres + 1
     }
     
-    #Entire slice
+    #Non-voxelwise
     sid <- as.matrix(rep(id,length(spheres)))
     sph <- as.matrix(c(spheres))
     t1 <- as.matrix(refT1[c(spheres)])
     ID_Site <- as.matrix(rep(labelSidSite[indFiltSite,2],length(spheres)))
     
-    data_Site <- data.frame(sid, ID_Site, sph, t1, meanSite[,j])
+    data_Site <- data.frame(sid, ID_Site, sph, t1, meanSite[,j], sdSite[,j])
     
     if (j==1){
       dataTmp = rbind(data.frame(), data_Site)
@@ -103,7 +105,7 @@ comparison_across_sites <- function(site){
     }
   }
   
-  colnames(dataSite2plot) <- c('Site', 'ID_Site', 'Sphere', 'refT1', 'Mean')
+  colnames(dataSite2plot) <- c('Site', 'ID_Site', 'Sphere', 'refT1', 'Mean', 'Std')
   
   returnComparison <- list("dataSite" = dataSite2plot,
                            "dataSite_long" = dataSite2plot_long,

@@ -14,9 +14,8 @@ getHumanData <- function(site){
     for (k in labelHumanROI){
       #rowIndex = match(site[j],as.numeric(data2[,"id"]))
       siteData = as.numeric(unlist(listHuman[[site[j]]][rois[cnt_roi]]))
-      cnt_roi = cnt_roi + 1
       
-      #Pixelwise
+      #Voxelwise
       sid_long <- as.matrix(rep(id,length(siteData)))
       age_long <- as.matrix(rep(age,length(siteData)))
       sex_long <- as.matrix(rep(sex,length(siteData)))
@@ -36,6 +35,8 @@ getHumanData <- function(site){
         dataSite2plot_long = rbind(dataTmp_long,data_Site_long)
         dataTmp_long <- dataSite2plot_long
       }
+      
+      cnt_roi = cnt_roi + 1
     }
   }
   returnHumanData <- list("dataLong_human" = dataSite2plot_long)

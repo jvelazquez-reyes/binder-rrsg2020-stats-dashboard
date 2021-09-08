@@ -175,3 +175,15 @@ for (ii in seq(1,length(listHumanData))){
   }
 }
 colnames(dfmeanHuman) <- c('Site','roi_num','roi_lab','dif')
+
+##COMPARISON OF NIST PHANTOM AND HUMAN DATASETS##
+indNISTphantom <- c(3,4,5:10,25,26,28,31)
+a = match(indNISTphantom,data2[,"id"])
+indHUMANdata <- c(9,8,2:7,16,17,56,15)
+
+source("comparison_NISTHuman_nist.R")
+
+compNISTHuman_nist <- comparison_NISTHuman_nist(indNISTphantom)
+compNISTHuman_human <- comparison_NISThuman_human(indHUMANdata)
+compNISTHuman <- rbind(compNISTHuman_nist$data_NIST,compNISTHuman_human$data_human)
+

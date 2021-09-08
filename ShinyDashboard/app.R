@@ -313,7 +313,9 @@ ui <- navbarPage("T1 mapping challenge statistics", theme = shinytheme("flatly")
                             
                             mainPanel(
                                 h3("Difference (%) with MEX as reference"),
-                                plotlyOutput(outputId = "CompHumanSites")
+                                plotlyOutput(outputId = "CompHumanSites"),
+                                h3("NIST phantom and Human data"),
+                                plotlyOutput(outputId = "NISTHumanStats")
                             )
                         )
                         )
@@ -1176,6 +1178,24 @@ server <- function(input, output) {
                                     '<br> ROI: ', roi_lab)) %>%
             layout(xaxis = list(title = "ROI"), yaxis = list(title = "T1 value (ms)"),
                    legend = list(title = list(text = "<b>Site ID</b>")))
+    })
+    
+    covs_colors <- setNames(rainbow(12), unique(compNISTHuman$Site))
+    output$NISTHumanStats <- renderPlotly({
+        plot_ly(compNISTHuman) %>%
+            add_trace(compNISTHuman, x = ~Mean, y = ~Std, color = ~as.factor(NPHuman),
+                      colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~Site),
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Sigma (ms): ', signif(Std,4),
+                                    '<br> Mean (ms): ', signif(Mean,5),
+                                    '<br> CoV (%): ', signif(100*Std/Mean,4),
+                                    '<br> Reference T1 (ms)/ROI: ', t1ROI,
+                                    '<br> Site ID: ', Site)) %>%
+            layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(compNISTHuman,2,max))[3])+100)),
+                   yaxis = list(title=list(text="Sigma value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(compNISTHuman,2,max))[4])+100)),
+                   legend = list(title=list(text="<b>Site ID</b>")))
     })
     
     #TAB 8
