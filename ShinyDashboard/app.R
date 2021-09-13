@@ -535,7 +535,6 @@ server <- function(input, output) {
                        yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
                                     range=list(0,unname(apply(DispersionAllPointsMagComp,2,max))[4]+100)),
                        legend = list(title=list(text="<b>Reference T1 (ms)</b>"))) %>%
-                #,shapes=list(type="line", X0=0, x1=500, y0=0, y1=500))
                 add_trace(x = c(0, unname(apply(DispersionAllPointsMagComp,2,max))[5]+100), y = c(0, unname(apply(DispersionAllPointsMagComp,2,max))[4]+100),
                           type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
         })
@@ -555,8 +554,11 @@ server <- function(input, output) {
                                     '<br> Measured T1: ', signif(Mean,6),
                                     '<br> Reference T1: ', signif(refT1,6),
                                     '<br> Sphere: ', Sphere)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "T1 value (ms)"),
-                   legend = list(title = list(text = "<b>Site ID</b>")))
+            layout(xaxis = list(title=list(text="Reference T1 value (ms)",font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                   range=list(0,as.numeric(unname(apply(MeasSites$dataSite,2,max))[4])+100)),
+                   yaxis = list(title=list(text="T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                   range=list(0,as.numeric(unname(apply(MeasSites$dataSite,2,max))[5])+100)),
+                   legend = list(title=list(text="<b>Site ID</b>")))
     })
     
     output$DispAllPoints <- renderPlotly({
@@ -576,27 +578,22 @@ server <- function(input, output) {
             DispersionAllPoints = SiteAustralia
         }
         
-        p <- ggplot(data = DispersionAllPoints$dataSite_long,
-                    aes(x = t1_long, y = siteData, fill = ID_Site_long,
-                        text = paste('<br> Measured T1 Value: ', signif(siteData,6),
-                                     '<br> Reference T1 Value: ', signif(t1_long,6),
-                                     '<br> Sphere: ', sph_long)),
-                    color = "black", size = 1.5) +
-            geom_point() +
-            labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
-            geom_smooth(aes(x = t1_long, y = siteData), method = "lm", formula = y~x,
-                        se = FALSE, color = "red", lwd = 0.5) +
-            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        p <- p + guides(fill=guide_legend(title="Site ID"))
-        ggplotly(p, tooltip = "text")
+        specSite_colors <- setNames(rainbow(length(unique(DispersionAllPoints$dataSite_long$ID_Site_long))), unique(DispersionAllPoints$dataSite_long$ID_Site_long))
+        plot_ly(DispersionAllPoints$dataSite_long) %>%
+            add_trace(DispersionAllPoints$dataSite_long, x = ~t1_long, y = ~siteData, color = ~ID_Site_long,
+                      colors = specSite_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Measured T1 value (ms): ', signif(siteData,5),
+                                    '<br> Reference T1 value (ms): ', signif(t1_long,5),
+                                    '<br> ID: ', sid_long)) %>%
+            layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[4])+100)),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[5])+100)),
+                   legend = list(title=list(text="<bSite ID</b>"))) %>%
+            add_trace(x = c(0, as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[4])+100),
+                      y = c(0, as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[5])+100),
+                      type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
     })
     
     output$AcErrorAllPoints <- renderPlotly({
@@ -618,24 +615,19 @@ server <- function(input, output) {
         
         AcErrorAllPoints = subset(AcErrorAllPoints$dataSite_long, ac_error <= input$errorThr[2])
         
-        p <- ggplot(data = AcErrorAllPoints,
-                    aes(x = t1_long, y = ac_error, fill = ID_Site_long,
-                        text = paste('<br> Accuracy Error: ', signif(ac_error,3),
-                                     '<br> Reference T1 Value: ', signif(t1_long,6),
-                                     '<br> Sphere: ', sph_long)),
-                    color = "black", size = 1.5) +
-            geom_point() +
-            labs(x = "Reference T1 value (ms)", y = "Accuracy Error (%)") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        p <- p + guides(fill=guide_legend(title="Site ID"))
-        ggplotly(p, tooltip = "text")
+        specSite_colors <- setNames(rainbow(length(unique(AcErrorAllPoints$ID_Site_long))), unique(AcErrorAllPoints$ID_Site_long))
+        plot_ly(AcErrorAllPoints) %>%
+            add_trace(AcErrorAllPoints, x = ~t1_long, y = ~ac_error, color = ~ID_Site_long,
+                      colors = specSite_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Accuracy Error (%): ', signif(ac_error,5),
+                                    '<br> Reference T1 value (ms): ', signif(t1_long,5),
+                                    '<br> ID: ', sid_long)) %>%
+            layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(AcErrorAllPoints,2,max))[4])+100)),
+                   yaxis = list(title=list(text="Accuracy Error (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,60)),
+                   legend = list(title=list(text="<bSite ID</b>")))
     })
     
     output$CorrSphSites <- renderTable({
@@ -696,29 +688,8 @@ server <- function(input, output) {
         g3 <- HSFData$diffDeciles[[3]]
         g2 <- HSFData$diffDeciles[[2]]
         g1 <- HSFData$diffDeciles[[1]]
-        subplot(g14,g13,g12,g11,g10,g9,g8,g7,g6,g5,g4,g3,g2,g1, nrows = 4)
+        subplot(g14,g13,g12,g11,g10,g9,g8,g7,g6,g5,g4,g3,g2,g1, nrows = 3)
     })
-
-    #output$BootstrapDensities <- renderPlotly({
-    #    HSFData <- hierarchical_shift_function(dataSites, input$DispHSF)
-    #    p <- ggplot(HSFData$densitiesBootstrap, aes(x = boot_samp, y = quantile)) +
-    #        theme_classic() +
-    #        stat_halfeye(#fill = "orange", 
-    #            point_interval = mode_hdi,
-    #            .width = c(0.5, 0.9)
-    #        ) +
-    #        geom_vline(xintercept = 0) +
-    #        scale_y_continuous(breaks = seq(0.1,0.9,0.1)) +
-    #        theme(plot.title = element_text(size=22),
-    #              axis.title.x = element_text(size = 18),
-    #              axis.text = element_text(size = 16, colour = "black"),
-    #              axis.title.y = element_text(size = 18)) + 
-    #        xlab("Bootstrap differences") +
-    #        ylab("Deciles") +
-    #        #coord_cartesian(xlim = c(-1, 0.1)) +
-    #        coord_flip()
-    #    p
-    #})
 
     #TAB 5
     output$Disp4Site <- renderPlotly({
@@ -737,28 +708,22 @@ server <- function(input, output) {
         else if (input$selectCompSite == "Australia"){
             RefVSMeas = measuredT1_against_referenceT1(scans = Australia)
         }
- 
-        p <- ggplot(data = RefVSMeas$BAData,
-                    aes(x = reference, y = measValue, fill = ID_Site,
-                        text = paste('<br> Measured T1 Value: ', signif(measValue,6),
-                                     '<br> Reference T1 Value: ', signif(reference,6),
-                                     '<br> Sphere: ', sph)),
-                    color = "black", size = 1.5) +
-            geom_point() +
-            labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
-            geom_smooth(aes(x = reference, y = measValue), method = "lm", formula = y~x,
-                        se = FALSE, color = "red", lwd = 0.5) +
-            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank()) +
-            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        p <- p + guides(fill=guide_legend(title="Site ID"))
-        ggplotly(p, tooltip = "text")
+        
+        sitesFiltBA_colors <- setNames(rainbow(length(unique(RefVSMeas$BAData$ID_Site))), unique(RefVSMeas$BAData$ID_Site))
+        plot_ly(RefVSMeas$BAData) %>%
+            add_trace(RefVSMeas$BAData, x = ~reference, y = ~measValue, color = ~ID_Site, 
+                      colors = sitesFiltBA_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Measured T1 value (ms): ', signif(measValue,5),
+                                    '<br> Reference T1 value (ms): ', signif(reference,5),
+                                    '<br> Sphere: ', sph)) %>%
+            layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100)),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100)),
+                   legend = list(title=list(text="<b>Site ID</b>"))) %>%
+            add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100), y = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100),
+                      type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
     })
     
     output$BA4Site <- renderPlotly({
@@ -778,47 +743,40 @@ server <- function(input, output) {
             RefVSMeas = measuredT1_against_referenceT1(scans = Australia)
         }
         
-        p <- ggplot(data = RefVSMeas$BAData,
-                    aes(x = average, y = perc_difference, fill = ID_Site,
-                        text = paste('<br> Difference (%): ', signif(perc_difference,4),
-                                     '<br> Average T1: ', signif(average,5),
-                                     '<BR> Reference T1: ', signif(reference,5),
-                                     '<br> Sphere: ', sph)), 
-                    pch = 1, size = 1.5, col = "black") +
-            geom_point() +
-            labs(x = "Average T1 (ms)", 
-                 y = "Difference (%)") +
-            xlim(200,2150) +
-            ylim(-40, 40) +
-            # Bias line
-            geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference), lwd = 1) +
-            # Line: y=0
-            #geom_hline(yintercept = 0, lty = 3, col = "grey30") +
-            # Limits of Agreement
-            geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference) + 
-                           1.96 * sd(RefVSMeas$BAData$perc_difference), 
-                       lty = 2, col = "firebrick") +
-            geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference) - 
-                           1.96 * sd(RefVSMeas$BAData$perc_difference), 
-                       lty = 2, col = "firebrick") +
-            theme(panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank()) +
-            geom_text(label = paste("Mean = ",signif(mean(RefVSMeas$BAData$perc_difference),3)), 
-                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 2, size = 3, 
-                      colour = "black") +
-            geom_text(label = paste("Mean+1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)+1.96*sd(RefVSMeas$BAData$perc_difference),3)),
-                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 
-                          1.96*sd(RefVSMeas$BAData$perc_difference) + 2,
-                      size = 3, colour = "firebrick") +
-            geom_text(label = paste("Mean-1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)-1.96*sd(RefVSMeas$BAData$perc_difference),3)), 
-                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) - 
-                          1.96 * sd(RefVSMeas$BAData$perc_difference) - 2, 
-                      size = 3, colour = "firebrick") +
-            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        p <- p + guides(fill=guide_legend(title="Site ID"))
-        ggplotly(p, tooltip = "text")
+        sitesFiltBA_colors <- setNames(rainbow(length(unique(RefVSMeas$BAData$ID_Site))), unique(RefVSMeas$BAData$ID_Site))
+        plot_ly(RefVSMeas$BAData) %>%
+            add_trace(RefVSMeas$BAData, x = ~average, y = ~perc_difference, color = ~ID_Site, 
+                      colors = sitesFiltBA_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Difference (%): ', signif(perc_difference,4),
+                                    '<br> Average T1: ', signif(average,5),
+                                    '<BR> Reference T1: ', signif(reference,5),
+                                    '<br> Sphere: ', sph)) %>%
+            layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100)),
+                   yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(-40,40)),
+                   legend = list(title=list(text="<b>Site ID</b>"))) %>%
+            add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100), y = mean(RefVSMeas$BAData$perc_difference),
+                      type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
+                      showlegend = FALSE, hoverinfo = "none") %>%
+            add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100),
+                      y = mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference),
+                      type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                      showlegend = FALSE, hoverinfo = "none") %>%
+            add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100),
+                      y = mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference),
+                      type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                      showlegend = FALSE, hoverinfo = "none") %>%
+            layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference)-3,
+                                      text=paste("Mean = ",signif(mean(RefVSMeas$BAData$perc_difference),3)),
+                                      showarrow = FALSE, font = list(size=12, color="black"))) %>%
+            layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference) + 5,
+                                      text=paste("Mean+1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)+1.96*sd(RefVSMeas$BAData$perc_difference),3)),
+                                      showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
+            layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference) - 5,
+                                      text=paste("Mean-1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)-1.96*sd(RefVSMeas$BAData$perc_difference),3)),
+                                      showarrow = FALSE, font = list(size=12, color="firebrick")))
     })
     
     output$CorrSites <- renderTable({
@@ -852,27 +810,21 @@ server <- function(input, output) {
             RefVSMeas = measuredT1_against_referenceT1(scans = Philips)
         }
         
-        p <- ggplot(data = RefVSMeas$BAData,
-                    aes(x = reference, y = measValue, fill = ID_Vendor,
-                        text = paste('<br> Measured T1 Value: ', signif(measValue,6),
-                                     '<br> Reference T1 Value: ', signif(reference,6),
-                                     '<br> Sphere: ', sph)),
-                    color = "black", size = 1.5) +
-            geom_point() +
-            labs(x = "Reference T1 value (ms)", y = "Measured T1 value (ms)") +
-            geom_smooth(aes(x = reference, y = measValue), method = "lm", formula = y~x,
-                        se = FALSE, color = "red", lwd = 0.5) +
-            geom_abline(intercept = 0, slope = 1, lwd = 0.7, col = "blue") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(),
-                  panel.background = element_blank()) +
-            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        p <- p + guides(fill=guide_legend(title="MRI Vendor"))
-        ggplotly(p, tooltip = "text")
+        vendorFiltBA_colors <- setNames(rainbow(length(unique(RefVSMeas$BAData$ID_Vendor))), unique(RefVSMeas$BAData$ID_Vendor))
+        plot_ly(RefVSMeas$BAData) %>%
+            add_trace(RefVSMeas$BAData, x = ~reference, y = ~measValue, color = ~ID_Vendor, 
+                      colors = vendorFiltBA_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Measured T1 value (ms): ', signif(measValue,5),
+                                    '<br> Reference T1 value (ms): ', signif(reference,5),
+                                    '<br> Sphere: ', sph)) %>%
+            layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100)),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100)),
+                   legend = list(title=list(text="<b>MRI vendor</b>"))) %>%
+            add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100), y = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100),
+                      type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
     })
     
     output$BA4Vendor <- renderPlotly({
@@ -886,47 +838,42 @@ server <- function(input, output) {
             RefVSMeas = measuredT1_against_referenceT1(scans = Philips)
         }
         
-        p <- ggplot(data = RefVSMeas$BAData,
-                    aes(x = average, y = perc_difference, fill = ID_Vendor,
-                        text = paste('<br> Difference (%): ', signif(perc_difference,4),
-                                     '<br> Average T1: ', signif(average,5),
-                                     '<BR> Reference T1: ', signif(reference,5),
-                                     '<br> Sphere: ', sph)), 
-                    pch = 1, size = 1.5, col = "black") +
-            geom_point() +
-            labs(x = "Average T1 (ms)", 
-                 y = "Difference (%)") +
-            xlim(200,2150) +
-            ylim(-35, 35) +
-            # Bias line
-            geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference), lwd = 1) +
-            # Line: y=0
-            #geom_hline(yintercept = 0, lty = 3, col = "grey30") +
-            # Limits of Agreement
-            geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference) + 
-                           1.96 * sd(RefVSMeas$BAData$perc_difference), 
-                       lty = 2, col = "firebrick") +
-            geom_hline(yintercept = mean(RefVSMeas$BAData$perc_difference) - 
-                           1.96 * sd(RefVSMeas$BAData$perc_difference), 
-                       lty = 2, col = "firebrick") +
-            theme(panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank()) +
-            geom_text(label = paste("Mean = ",signif(mean(RefVSMeas$BAData$perc_difference),3)), 
-                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 2, size = 3, 
-                      colour = "black") +
-            geom_text(label = paste("Mean+1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)+1.96*sd(RefVSMeas$BAData$perc_difference),3)),
-                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) + 
-                          1.96*sd(RefVSMeas$BAData$perc_difference) + 2,
-                      size = 3, colour = "firebrick") +
-            geom_text(label = paste("Mean-1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)-1.96*sd(RefVSMeas$BAData$perc_difference),3)), 
-                      x = 1800, y = mean(RefVSMeas$BAData$perc_difference) - 
-                          1.96 * sd(RefVSMeas$BAData$perc_difference) - 2, 
-                      size = 3, colour = "firebrick") +
-            theme_bw() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-                               axis.title = element_text(size = 12),
-                               axis.text = element_text(size = 12))
-        p <- p + guides(fill=guide_legend(title="MRI Vendor"))
-        ggplotly(p, tooltip = "text")
+        
+        
+        vendorFiltBA_colors <- setNames(rainbow(length(unique(RefVSMeas$BAData$ID_Vendor))), unique(RefVSMeas$BAData$ID_Vendor))
+        plot_ly(RefVSMeas$BAData) %>%
+            add_trace(RefVSMeas$BAData, x = ~average, y = ~perc_difference, color = ~ID_Vendor, 
+                      colors = vendorFiltBA_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                      hoverinfo = 'text',
+                      text = ~paste('<br> Difference (%): ', signif(perc_difference,4),
+                                    '<br> Average T1: ', signif(average,5),
+                                    '<BR> Reference T1: ', signif(reference,5),
+                                    '<br> Sphere: ', sph)) %>%
+            layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100)),
+                   yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(-40,40)),
+                   legend = list(title=list(text="<b>MRI vendor</b>"))) %>%
+            add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100), y = mean(RefVSMeas$BAData$perc_difference),
+                      type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
+                      showlegend = FALSE, hoverinfo = "none") %>%
+            add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100),
+                      y = mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference),
+                      type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                      showlegend = FALSE, hoverinfo = "none") %>%
+            add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100),
+                      y = mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference),
+                      type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                      showlegend = FALSE, hoverinfo = "none") %>%
+            layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference)-3,
+                                      text=paste("Mean = ",signif(mean(RefVSMeas$BAData$perc_difference),3)),
+                                      showarrow = FALSE, font = list(size=12, color="black"))) %>%
+            layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference) + 5,
+                                      text=paste("Mean+1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)+1.96*sd(RefVSMeas$BAData$perc_difference),3)),
+                                      showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
+            layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference) - 5,
+                                      text=paste("Mean-1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)-1.96*sd(RefVSMeas$BAData$perc_difference),3)),
+                                      showarrow = FALSE, font = list(size=12, color="firebrick")))
     })
     
     output$CorrVendor <- renderTable({
@@ -967,55 +914,29 @@ server <- function(input, output) {
             #group_by(sid) %>%
             add_trace(type = 'scatter', mode = 'lines+markers',
                       hoverinfo = 'text',
-                      text = ~paste('<br> Site: ', sid,
+                      text = ~paste('<br> SD/Reference T1: ', signif(stdValues/reference,3),
                                     '<br> SD: ', signif(stdValues,3),
-                                    '<br> Reference T1: ', signif(reference,6),
-                                    '<br> Sphere: ', sph)) %>%
-            layout(xaxis = list(title = "Reference T1 value (ms)"), yaxis = list(title = "SD/Reference T1"),
-                   legend = list(title = list(text = "<b>Site ID</b>")))
+                                    '<br> Reference T1: ', signif(reference,5),
+                                    '<br> Site: ', ID_Site)) %>%
+            layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="SD/Reference T1", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,0.2)),
+                   legend = list(title=list(text="<b>Site ID</b>")))
     })
 
     #TAB 7
     output$boxPlotHuman <- renderPlotly({
-        p <- plot_ly(sitesHuman$dataLong_human, x = ~roi_long, y = ~siteData, split = ~roi_long,
-                     type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE), points = 'all'
-                     ) %>%
-            add_trace(hoverinfo = 'text',
+        plot_ly(sitesHuman$dataLong_human, x = ~roi_long, y = ~siteData, color = ~roi_long,
+                type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE)) %>%
+            add_trace(hoveron = 'points+violins', points = 'all', hoverinfo = 'text',
                       text = ~paste0('<br> Measured value: ', signif(siteData,5),
-                                    '<br>ROI: ', roi_long,
-                                    '<br>SID: ', factor(sid_long)), hoveron = 'points')
-        #p <- p %>% layout(hovermode = "x unified")
-            #         text = ~paste('</br> Measured value: ', signif(siteData,5),
-            #                       '</br> ROI: ', roi_long,
-            #                       '</br> SID: ', factor(sid_long)))
-        #p <- ggplot(data = sitesHuman$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
-            #geom_flat_violin(position = position_nudge(x = .2, y = 0), alpha = .8) +
-            #geom_point(aes(y = siteData, color = factor(roi_long)),
-            #           position = position_jitter(width = .15), size = .5, alpha = 0.8) +
-            #geom_boxplot(width = .1, guides = FALSE, outlier.shape = NA, alpha = 0.5) +
-            #geom_boxplot(data = sitesHuman$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long),
-            #                                                   text = paste('<br> Measured Value: ', signif(siteData,5),
-            #                                                                '<br> ROI: ', roi_long,
-            #                                                                '<br> SID: ', factor(sid_long))),
-            #             position = position_nudge(x=0.4),
-            #             width = 0.5, color="grey", alpha=0.2) +
-            #geom_jitter(data = sitesHuman$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long),
-            #                                                  text = paste('<br> Measured Value: ', signif(siteData,5),
-            #                                                               '<br> ROI: ', roi_long,
-            #                                                               '<br> SID: ', factor(sid_long))),
-            #            position = position_nudge(x=0.4)) +
-        #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            #labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            #theme(axis.line = element_line(colour = "black"), 
-            #      panel.grid.major = element_blank(), 
-            #      panel.grid.minor = element_blank(), 
-            #      panel.border = element_blank(), 
-            #      panel.background = element_blank()) +
-            #theme_classic() + theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-            #                   axis.title = element_text(size = 12),
-            #                   axis.text = element_text(size = 12))
-        #ggplotly(p, tooltip = "text")
-        p
+                                     '<br>ROI: ', roi_long,
+                                     '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
+            layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
+                                           as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
+                   legend = list(title=list(text="<b>ROI</b>")))
     })
     
     output$humanMEX_vendor <- renderPlotly({
@@ -1026,161 +947,135 @@ server <- function(input, output) {
             dataMEX_vendor = subset(sitesHuman_Mexico$dataLong_human, as.character(vendor_long)=="GE")
         }
         
-        p <- ggplot(data = dataMEX_vendor, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
-            geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4)) +
-            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", shape = "SID") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank())
-        ggplotly(p, tooltip = "text")
+        plot_ly(dataMEX_vendor, x = ~roi_long, y = ~siteData, color = ~roi_long,
+                type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE)) %>%
+            add_trace(hoveron = 'points+violins', points = 'all', hoverinfo = 'text',
+                      text = ~paste0('<br> Measured value: ', signif(siteData,5),
+                                     '<br>ROI: ', roi_long,
+                                     '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
+            layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(as.numeric(unname(apply(sitesHuman_Mexico$dataLong_human,2,min))[6])-100,
+                                           as.numeric(unname(apply(sitesHuman_Mexico$dataLong_human,2,max))[6])+100)),
+                   legend = list(title=list(text="<b>ROI</b>")))
     })
     
     output$humanMEX_all <- renderPlotly({
-        p <- ggplot(data = sitesHuman_Mexico$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
-            geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4)) +
-            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            #scale_x_discrete(labels = c("1"="Genu WM","2"="Splenium WM","3"="Deep GM","4"="Cortical GM")) +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank())
-        ggplotly(p, tooltip = "text")
+        plot_ly(sitesHuman_Mexico$dataLong_human, x = ~roi_long, y = ~siteData, color = ~roi_long,
+                type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE)) %>%
+            add_trace(hoveron = 'points+violins', points = 'all', hoverinfo = 'text',
+                      text = ~paste0('<br> Measured value: ', signif(siteData,5),
+                                     '<br>ROI: ', roi_long,
+                                     '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
+            layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
+                                           as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
+                   legend = list(title=list(text="<b>ROI</b>")))
     })
     
     output$humanCAN_all <- renderPlotly({
-        p <- ggplot(data = sitesHuman_Canada$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
-            geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4)) +
-            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank())
-        ggplotly(p, tooltip = "text")
+        plot_ly(sitesHuman_Canada$dataLong_human, x = ~roi_long, y = ~siteData, color = ~roi_long,
+                type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE)) %>%
+            add_trace(hoveron = 'points+violins', points = 'all', hoverinfo = 'text',
+                      text = ~paste0('<br> Measured value: ', signif(siteData,5),
+                                     '<br>ROI: ', roi_long,
+                                     '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
+            layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
+                                           as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
+                   legend = list(title=list(text="<b>ROI</b>")))
     })
     
     output$humanUS_all <- renderPlotly({
-        p <- ggplot(data = sitesHuman_US$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
-            geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4)) +
-            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank())
-        ggplotly(p, tooltip = "text")
+        plot_ly(sitesHuman_US$dataLong_human, x = ~roi_long, y = ~siteData, color = ~roi_long,
+                type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE)) %>%
+            add_trace(hoveron = 'points+violins', points = 'all', hoverinfo = 'text',
+                      text = ~paste0('<br> Measured value: ', signif(siteData,5),
+                                     '<br>ROI: ', roi_long,
+                                     '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
+            layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
+                                           as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
+                   legend = list(title=list(text="<b>ROI</b>")))
     })
     
     output$humanITA_all <- renderPlotly({
-        p <- ggplot(data = sitesHuman_Italy$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
-            geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4)) +
-            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank())
-        ggplotly(p, tooltip = "text")
+        plot_ly(sitesHuman_Italy$dataLong_human, x = ~roi_long, y = ~siteData, color = ~roi_long,
+                type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE)) %>%
+            add_trace(hoveron = 'points+violins', points = 'all', hoverinfo = 'text',
+                      text = ~paste0('<br> Measured value: ', signif(siteData,5),
+                                     '<br>ROI: ', roi_long,
+                                     '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
+            layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
+                                           as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
+                   legend = list(title=list(text="<b>ROI</b>")))
     })
     
     output$humanGER_all <- renderPlotly({
-        p <- ggplot(data = sitesHuman_Germany$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
-            geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4)) +
-            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank())
-        ggplotly(p, tooltip = "text")
+        plot_ly(sitesHuman_Germany$dataLong_human, x = ~roi_long, y = ~siteData, color = ~roi_long,
+                type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE)) %>%
+            add_trace(hoveron = 'points+violins', points = 'all', hoverinfo = 'text',
+                      text = ~paste0('<br> Measured value: ', signif(siteData,5),
+                                     '<br>ROI: ', roi_long,
+                                     '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
+            layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
+                                           as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
+                   legend = list(title=list(text="<b>ROI</b>")))
     })
     
     output$humanAUS_all <- renderPlotly({
-        p <- ggplot(data = sitesHuman_Australia$dataLong_human, aes(x = roi_long, y = siteData, fill = factor(roi_long))) +
-            geom_violin(width = 0.5) +
-            geom_boxplot(width = 0.5, color="grey", alpha=0.2) +
-            geom_jitter(aes(text = paste('<br> Measured Value: ', signif(siteData,5),
-                                         '<br> ROI: ', roi_long,
-                                         '<br> SID: ', factor(sid_long))),
-                        position = position_nudge(x=0.4)) +
-            #p <- ggplot(data = filter(sitesHuman$dataLong_human, sid %in% input$boxPlotSite)) +
-            labs(x = "Region of Interest (ROI)", y = "Measured T1 value (ms)", color = "SID") +
-            theme(axis.line = element_line(colour = "black"), 
-                  panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank(), 
-                  panel.border = element_blank(), 
-                  panel.background = element_blank())
-        ggplotly(p, tooltip = "text")
+        plot_ly(sitesHuman_Australia$dataLong_human, x = ~roi_long, y = ~siteData, color = ~roi_long,
+                type = 'violin', box = list(visible = TRUE), meanline = list(visible = TRUE)) %>%
+            add_trace(hoveron = 'points+violins', points = 'all', hoverinfo = 'text',
+                      text = ~paste0('<br> Measured value: ', signif(siteData,5),
+                                     '<br>ROI: ', roi_long,
+                                     '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
+            layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
+                                           as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
+                   legend = list(title=list(text="<b>ROI</b>")))
     })
     
     sitesHuman$dataLong_human$age_long=as.numeric(as.character(sitesHuman$dataLong_human$age_long))
     output$humanAge_all <- renderPlotly({
         #sdFiltered_colors <- setNames(rainbow(nrow(sdFilteredSites$stdData)), sdFilteredSites$stdData$ID_Site)
         plot_ly(sitesHuman$dataLong_human[order(sitesHuman$dataLong_human$age_long),], x = ~age_long, y = ~siteData, split = ~roi_long) %>%
-            #group_by(sid) %>%
-            add_trace(type = 'scatter', mode = 'lines+markers',
+            add_trace(type = 'scatter', mode = 'markers',
                       hoverinfo = 'text',
                       text = ~paste('<br> Site: ', sid_long,
                                     '<br> ROI: ', roi_long,
                                     '<br> T1 value: ', signif(siteData,5))) %>%
-            layout(xaxis = list(title = "Age (years)",categoryarray = ~names, categoryorder = "array"), yaxis = list(title = "Measured T1 value (ms)"),
-                   legend = list(title = list(text = "<b>ROI</b>")))
+            layout(xaxis = list(title=list(text="Age (years)", font=list(size=18)), categoryarray = ~names, categoryorder = "array", tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(0,as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
+                   legend = list(title=list(text="<b>ROI</b>")))
+
     })
     
     sitesHuman_colors <- setNames(rainbow(length(listHumanData)), unique(dfmeanHuman$Site))
     output$CompHumanSites <- renderPlotly({
         plot_ly(dfmeanHuman, x = ~roi_lab, y = ~dif, split = ~Site, color = ~Site, colors = sitesHuman_colors) %>%
             filter(Site %in% input$FiltHumanSitesID) %>%
-            #group_by(sid) %>%
             add_trace(type = 'scatter', mode = 'lines+markers',
                       hoverinfo = 'text',
                       text = ~paste('<br> Site: ', Site,
                                     '<br> Difference (%): ', signif(dif,4),
                                     '<br> ROI: ', roi_lab)) %>%
-            layout(xaxis = list(title = "ROI"), yaxis = list(title = "T1 value (ms)"),
-                   legend = list(title = list(text = "<b>Site ID</b>")))
+            layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
+                   yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                                range=list(as.numeric(unname(apply(dfmeanHuman,2,min,na.rm=T))[4])-10,as.numeric(unname(apply(dfmeanHuman,2,max,na.rm=T))[4])+10)),
+                   legend = list(title=list(text="<b>Site ID</b>")))
     })
     
-    covs_colors <- setNames(rainbow(12), unique(compNISTHuman$Site))
+    #covs_colors <- setNames(rainbow(12), unique(compNISTHuman$Site))
     output$NISTHumanStats <- renderPlotly({
         plot_ly(compNISTHuman) %>%
             add_trace(compNISTHuman, x = ~Mean, y = ~Std, color = ~as.factor(NPHuman),

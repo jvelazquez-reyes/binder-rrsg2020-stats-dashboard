@@ -4,25 +4,25 @@ hierarchical_shift_function <- function(dataSites){
   listHSFBootstrapDiff <- list()
   tempTitle = temperature_correction(20,42)
   for (sph in seq(14,1)){
-    a = unique(dataSites$sid_long)
+    uniqueSites = unique(dataSites$ID_Site_long)
     listdat1 = list()
     listdat2 = list()
     lengthDAT = array()
     
     # analysis parameters
-    np = 20
+    np = length(uniqueSites) # Number of submissions of interest
     qseq <- seq(0.1,0.9,0.1) # quantiles
     alpha <- 0.05
     nboot <- 500 # bootstrap
     tr <- 0.2 # group trimmed mean for each quantile
-    nq <- length(qseq)
+    nq <- length(qseq) #quantile length
     icrit <- round((1-alpha)*nboot) # 95th quantile
     ilo <- round((alpha/2)*nboot)
     iup <- nboot - ilo
     ilo <- ilo + 1
     
-    for (x in seq(1,length(a))) {
-      subdata = subset(dataSites, sid_long == a[x] & sph_long == sph)
+    for (x in seq(1,length(uniqueSites))) {
+      subdata = subset(dataSites, ID_Site_long == uniqueSites[x] & sph_long == sph)
       listdat1[[x]] = subdata$siteData
       listdat2[[x]] = subdata$t1_long
       lengthDAT[x] = nrow(subdata)
@@ -40,29 +40,32 @@ hierarchical_shift_function <- function(dataSites){
     
     df1 <- tibble(difference = as.vector(qdiff),
                   quantile = rep(qseq, each = np),
-                  site = factor(rep(seq(1:np), nq)))
+                  site = factor(rep(unique(dataSites$ID_Site_long), nq)))
     
     df1.md <- tibble(difference = gptm,
                      quantile = qseq)
     
-    p <- ggplot(df1, aes(x = quantile, 
-                         y = difference, 
-                         colour = site)) + 
-      theme_classic() +
-      geom_line(alpha = 0.5) +
-      geom_abline(slope = 0, intercept = 0) +
-      geom_line(data = df1.md, colour = "black", size = 1) +
-      geom_point(data = df1.md, colour = "black") +
-      scale_colour_viridis_d(option = "B") +
-      scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
-      scale_y_continuous(limits = c(-300,300), breaks = seq(-300,300,50)) +
-      ggtitle(paste("Reference T1 (ms): ", signif(tempTitle[sph],5))) +
-      theme(legend.position = "none",
-            plot.title = element_text(size=18),
-            axis.title.x = element_text(size = 18),
-            axis.text = element_text(size = 16, colour = "black"),
-            axis.title.y = element_text(size = 18)) + 
-      labs(x = "Deciles", y = "Difference")
+    hsf_colors <- setNames(rainbow(length(uniqueSites)), unique(df1$site))
+    p <- plotly_plot <- plot_ly(df1) %>%
+      add_trace(df1, x = ~quantile, y = ~difference, color = ~site, colors = hsf_colors,
+                                type = 'scatter', mode = 'markers+lines', marker = list(size = 5),
+                                hoverinfo = 'text',
+                                text = ~paste('<br> Decile: ', quantile,
+                                              '<br> Difference (ms): ', signif(difference,4),
+                                              '<br> ID: ', site)) %>%
+      layout(xaxis = list(title=list(text="Deciles", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,1), tickvals=seq(0.1,0.9,0.1)),
+             yaxis = list(title=list(text="Reference - Measured T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(-300,300)),
+             legend = list(title=list(text="<b>Site ID</b>")),
+             annotations = list(x=0.5, y=250, text=paste("Reference T1: ", signif(tempTitle[sph],5), " ms"),
+                                showarrow = FALSE, font = list(size=20, color="black"))) %>%
+      add_trace(x = c(0, 1), y = c(0, 1),
+                  type = "scatter", mode = "lines", line = list(color = 'black', width = 2), showlegend = FALSE) %>%
+      add_trace(data=df1.md, x = ~quantile, y = ~difference,
+                type = "scatter", mode = "markers+lines", marker = list(color = 'black', size = 10),
+                line = list(color = 'black', width = 4), showlegend = FALSE)
+    
     listHSFDiff[[sph]] <- p
     
     set.seed(8899)
@@ -106,29 +109,28 @@ hierarchical_shift_function <- function(dataSites){
                      ymin = int_to_plot[1,],
                      ymax = int_to_plot[2,])
     
-    p <- ggplot(df2, aes(x = quantile, 
-                                           y = difference, 
-                                           colour = site)) + 
-      theme_classic() +
-      geom_line(alpha = 0.5) +
-      geom_abline(slope = 0, intercept = 0) +
-      geom_line(data = df2.md, colour = "black", size = 1) +
-      # geom_point(data = df2.md, colour = "black", size = 2) +
-      geom_pointrange(data = df2.md, aes(ymin = ymin, ymax = ymax), 
-                      colour = "black", size = 0.75) +
-      scale_colour_viridis_d(option = "B") +
-      scale_x_continuous(breaks = seq(0.1,0.9,0.1)) +
-      scale_y_continuous(limits = c(-300,300), breaks = seq(-300,300,50)) +
-      # coord_cartesian(ylim = c(-500, 700)) +
-      ggtitle(paste("Reference T1 (ms): ", signif(tempTitle[sph],5))) +
-      theme(legend.position = "none",
-            plot.title = element_text(size=18),
-            axis.title.x = element_text(size = 18),
-            axis.text = element_text(size = 16, colour = "black"),
-            axis.title.y = element_text(size = 18)) + 
-      labs(x = "Deciles", y = "Differences")
-    # coord_flip()
-    # ggtitle("Non-Word - Word decile differences")
+    p <- plotly_plot <- plot_ly(df2) %>%
+      add_trace(df2, x = ~quantile, y = ~difference, color = ~site, colors = hsf_colors,
+                type = 'scatter', mode = 'markers+lines', marker = list(size = 5),
+                hoverinfo = 'text',
+                text = ~paste('<br> Decile: ', quantile,
+                              '<br> Difference (ms): ', signif(difference,4),
+                              '<br> ID: ', site)) %>%
+      layout(xaxis = list(title=list(text="Deciles", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                          range=list(0,1), tickvals=seq(0.1,0.9,0.1)),
+             yaxis = list(title=list(text="Reference - Measured T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                          range=list(-300,300)),
+             legend = list(title=list(text="<b>Site ID</b>")),
+             annotations = list(x=0.5, y=250, text=paste("Reference T1: ", signif(tempTitle[sph],5), " ms"),
+                                showarrow = FALSE, font = list(size=20, color="black"))) %>%
+      add_trace(x = c(0, 1), y = c(0, 1),
+                type = "scatter", mode = "lines", line = list(color = 'black', width = 2), showlegend = FALSE) %>%
+      add_trace(data=df2.md, x = ~quantile, y = ~difference,
+                error_y = ~list(symmetric = FALSE, color = 'black', array = ymax - difference,
+                                arrayminus = difference - ymin),
+                type = "scatter", mode = "markers+lines", marker = list(color = 'black', size = 10),
+                line = list(color = 'black', width = 4), showlegend = FALSE)
+    
     listHSFBootstrapDiff[[sph]] <- p
     #p.id <- p
     
@@ -144,7 +146,8 @@ hierarchical_shift_function <- function(dataSites){
   }
   
   returnHSF <- list("diffDeciles" = listHSFDiff,
-                    "diffBootstrapDiff" = listHSFBootstrapDiff)
+                    "diffBootstrapDiff" = listHSFBootstrapDiff,
+                    "a"=df1)
   
   return(returnHSF)
 }
