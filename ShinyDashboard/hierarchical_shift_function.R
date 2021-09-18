@@ -13,7 +13,7 @@ hierarchical_shift_function <- function(dataSites){
     np = length(uniqueSites) # Number of submissions of interest
     qseq <- seq(0.1,0.9,0.1) # quantiles
     alpha <- 0.05
-    nboot <- 500 # bootstrap
+    nboot <- 1000 # bootstrap
     tr <- 0.2 # group trimmed mean for each quantile
     nq <- length(qseq) #quantile length
     icrit <- round((1-alpha)*nboot) # 95th quantile
@@ -102,7 +102,7 @@ hierarchical_shift_function <- function(dataSites){
     
     df2 <- tibble(difference = as.vector(qdiff),
                   quantile = rep(qseq, each = np),
-                  site = factor(rep(seq(1:np), nq)))
+                  site = factor(rep(unique(dataSites$ID_Site_long), nq)))
     
     df2.md <- tibble(difference = gptm,
                      quantile = qseq,
@@ -147,7 +147,8 @@ hierarchical_shift_function <- function(dataSites){
   
   returnHSF <- list("diffDeciles" = listHSFDiff,
                     "diffBootstrapDiff" = listHSFBootstrapDiff,
-                    "a"=df1)
+                    "a"=df1,
+                    "b"=df2)
   
   return(returnHSF)
 }

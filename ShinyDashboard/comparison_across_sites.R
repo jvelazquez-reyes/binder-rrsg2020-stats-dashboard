@@ -105,7 +105,7 @@ comparison_across_sites <- function(site){
     }
   }
   
-  colnames(dataSite2plot) <- c('Site', 'ID_Site', 'Sphere', 'refT1', 'Mean', 'Std')
+  colnames(dataSite2plot) <- c('sid', 'ID_Site', 'Sphere', 'refT1', 'Mean', 'Std')
   
   returnComparison <- list("dataSite" = dataSite2plot,
                            "dataSite_long" = dataSite2plot_long,

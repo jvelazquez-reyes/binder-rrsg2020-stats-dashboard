@@ -113,6 +113,7 @@ sdGermany <- measuredT1_against_referenceT1(Germany)
 source("hierarchical_shift_function.R")
 
 dataSites <- MeasSites$dataSite_long
+HSFData <- hierarchical_shift_function(dataSites)
 
 ##LINEAR MIXED EFFECTS MODEL##
 source("linear_mixed_effects_model.R")
