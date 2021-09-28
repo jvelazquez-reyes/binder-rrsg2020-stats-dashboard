@@ -1,0 +1,1 @@
+Rscript -e 'install.packages("dashboardthemes", repos="https://cloud.r-project.org")'
