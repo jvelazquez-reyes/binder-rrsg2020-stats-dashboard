@@ -1,1 +1,1 @@
-Rscript -e 'install.packages("dashboardthemes", repos="https://cloud.r-project.org")'
+Rscript -e 'devtools::install_github("nik01010/dashboardthemes")'
