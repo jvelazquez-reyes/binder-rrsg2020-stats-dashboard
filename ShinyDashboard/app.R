@@ -441,10 +441,17 @@ ui <- dashboardPage(
                       plotlyOutput(outputId = "humanAge_all"))
                 ),
                 
+                h2("Comparison of NIST phantom and Human data"),
                 fluidRow(
                   column(2),
-                  box(title="NIST phantom and Human data", width=5, solidHeader=TRUE, status="warning",
-                      plotlyOutput(outputId = "NISTHumanStats"))
+                  box(title="NIST Phantom dataset", width=10, solidHeader=TRUE, status="warning",
+                      plotlyOutput(outputId = "NISTHumanStats_np")),
+                ),
+                
+                fluidRow(
+                  column(2),
+                  box(title="Human dataset", width=10, solidHeader=TRUE, status="warning",
+                      plotlyOutput(outputId = "NISTHumanStats_h"))
                 )
         )
       )
@@ -1073,20 +1080,43 @@ server <- function(input, output) {
   })
   
   #covs_colors <- setNames(rainbow(12), unique(compNISTHuman$Site))
-  output$NISTHumanStats <- renderPlotly({
-    plot_ly(compNISTHuman) %>%
-      add_trace(compNISTHuman, x = ~Mean, y = ~Std, color = ~as.factor(NPHuman),
-                colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~Site),
+  maxX = as.numeric(unname(apply(compNISTHuman,2,max, na.rm=T))[4])
+  maxY = as.numeric(unname(apply(compNISTHuman,2,max, na.rm=T))[5])
+  maxSampleSize = as.numeric(unname(apply(compNISTHuman,2,max, na.rm=T))[7])
+  
+  output$NISTHumanStats_np <- renderPlotly({
+    plot_ly(compNISTHuman_nist$data_NIST) %>%
+      add_trace(compNISTHuman_nist$data_NIST, x = ~Mean, y = ~Std, color = ~Site_name,
+                colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~szSample*30/maxSampleSize),
                 hoverinfo = 'text',
-                text = ~paste('<br> Sigma (ms): ', signif(Std,4),
+                text = ~paste('<br> STD (ms): ', signif(Std,4),
                               '<br> Mean (ms): ', signif(Mean,5),
                               '<br> CoV (%): ', signif(100*Std/Mean,4),
-                              '<br> Reference T1 (ms)/ROI: ', t1ROI,
+                              '<br> Reference T1 (ms): ', signif(t1ROI,5),
+                              '<br> Sample size: ', szSample,
                               '<br> Site ID: ', Site)) %>%
       layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,as.numeric(unname(apply(compNISTHuman,2,max))[3])+100)),
-             yaxis = list(title=list(text="Sigma value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,as.numeric(unname(apply(compNISTHuman,2,max))[4])+100)),
+                          range=list(0,maxX+100)),
+             yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                          range=list(0,maxY+100)),
+             legend = list(title=list(text="<b>Site ID</b>")))
+  })
+  
+  output$NISTHumanStats_h <- renderPlotly({
+    plot_ly(compNISTHuman_human$data_human) %>%
+      add_trace(compNISTHuman_human$data_human, x = ~Mean, y = ~Std, color = ~Site_name,
+                colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~szSample*30/maxSampleSize),
+                hoverinfo = 'text',
+                text = ~paste('<br> STD (ms): ', signif(Std,4),
+                              '<br> Mean (ms): ', signif(Mean,5),
+                              '<br> CoV (%): ', signif(100*Std/Mean,4),
+                              '<br> ROI: ', t1ROI,
+                              '<br> Sample size: ', szSample,
+                              '<br> Site ID: ', Site)) %>%
+      layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                          range=list(0,maxX+100)),
+             yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                          range=list(0,maxY+100)),
              legend = list(title=list(text="<b>Site ID</b>")))
   })
 }

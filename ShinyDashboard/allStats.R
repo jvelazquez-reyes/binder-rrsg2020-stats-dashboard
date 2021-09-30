@@ -182,9 +182,36 @@ indNISTphantom <- c(3,4,5:10,25,26,28,31)
 a = match(indNISTphantom,data2[,"id"])
 indHUMANdata <- c(9,8,2:7,16,17,56,15)
 
+#Sites who submitted both, NIST phantom and human data
+dualSub_Sites_np = c('Biomedical Engineering, Case Western Reserve University - 2.001',
+                  'McGill University Health Centre - Montreal General Hospital - 3.001',
+                  'Keck Medical Center of University of Southern California GE 1 - 4.001',
+                  'Keck Medical Center of University of Southern California GE 2 - 4.002',
+                  'Keck Medical Center of University of Southern California GE 1 - 4.003',
+                  'Keck Medical Center of University of Southern California GE 1 - 4.004',
+                  'Keck Medical Center of University of Southern California GE 2 - 4.005',
+                  'Keck Medical Center of University of Southern California GE 2 - 4.006',
+                  'Philips Research Hamburg - 6.013',
+                  'Philips Research Hamburg - 6.014',
+                  'McGill University Health Centre - Glen Site - Cedars - 7.002',
+                  'Liverpool Hospital Australia - 9.001')
+
+dualSub_Sites_h = c('Biomedical Engineering, Case Western Reserve University - 4.001',
+                     'McGill University Health Centre - Montreal General Hospital - 3.001',
+                     'Keck Medical Center of University of Southern California GE 1 - 2.001',
+                     'Keck Medical Center of University of Southern California GE 2 - 2.002',
+                     'Keck Medical Center of University of Southern California GE 1 - 2.003',
+                     'Keck Medical Center of University of Southern California GE 1 - 2.004',
+                     'Keck Medical Center of University of Southern California GE 2 - 2.005',
+                     'Keck Medical Center of University of Southern California GE 2 - 2.006',
+                     'Philips Research Hamburg - 8.001',
+                     'Philips Research Hamburg - 8.002',
+                     'McGill University Health Centre - Glen Site - Cedars - 10.001',
+                     'Liverpool Hospital Australia - 7.001')
+
 source("comparison_NISTHuman_nist.R")
 
-compNISTHuman_nist <- comparison_NISTHuman_nist(indNISTphantom)
-compNISTHuman_human <- comparison_NISThuman_human(indHUMANdata)
+compNISTHuman_nist <- comparison_NISTHuman_nist(indNISTphantom,dualSub_Sites_np)
+compNISTHuman_human <- comparison_NISThuman_human(indHUMANdata,dualSub_Sites_h)
 compNISTHuman <- rbind(compNISTHuman_nist$data_NIST,compNISTHuman_human$data_human)
 
