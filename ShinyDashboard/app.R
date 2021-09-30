@@ -12,6 +12,7 @@ library("plotly")
 library("shiny")
 library("shinythemes")
 library("shinydashboard")
+install.packages("dashboardthemes")
 library("dashboardthemes")
 
 source("allStats.R")
