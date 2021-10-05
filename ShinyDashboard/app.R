@@ -12,7 +12,6 @@ library("plotly")
 library("shiny")
 library("shinythemes")
 library("shinydashboard")
-devtools::install_github("nik01010/dashboardthemes")
 library("dashboardthemes")
 
 source("allStats.R")
@@ -444,15 +443,20 @@ ui <- dashboardPage(
                 
                 h2("Comparison of NIST phantom and Human data"),
                 fluidRow(
-                  column(2),
+                  box(width=2, solidHeader=TRUE, status="primary",
+                      radioButtons(inputId = "cov_std",
+                                   label = "Select:",
+                                   choices = c("Coefficient of variation", "Standard deviation"),
+                                    selected = "Coefficient of variation")),
+                               
                   box(title="NIST Phantom dataset", width=10, solidHeader=TRUE, status="warning",
-                      plotlyOutput(outputId = "NISTHumanStats_np")),
+                      plotlyOutput(outputId = "NISTHumanCOV_STD_np"))
                 ),
                 
                 fluidRow(
                   column(2),
                   box(title="Human dataset", width=10, solidHeader=TRUE, status="warning",
-                      plotlyOutput(outputId = "NISTHumanStats_h"))
+                      plotlyOutput(outputId = "NISTHumanCOV_STD_h"))
                 )
         )
       )
@@ -518,40 +522,76 @@ server <- function(input, output) {
   })
   
   output$BAMagComp <- renderPlotly({
-    plot_ly(magVScomp$dataMagComp) %>%
-      add_trace(magVScomp$dataMagComp, x = ~average, y = ~percDiff, color = ~as.factor(sid), 
-                colors = MagCom_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
-                hoverinfo = 'text',
-                text = ~paste('<br> Difference (%): ', signif(percDiff,4),
-                              '<br> Average T1: ', signif(average,5),
-                              '<BR> Reference T1: ', signif(refT1,5),
-                              '<br> ID: ', sid)) %>%
-      layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100)),
-             yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(unname(apply(magVScomp$dataMagComp,2,min))[5]-20,unname(apply(magVScomp$dataMagComp,2,max))[5]+20)),
-             legend = list(title=list(text="<b>Site ID</b>"))) %>%
-      add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100), y = mean(magVScomp$dataMagComp$percDiff),
-                type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
-                showlegend = FALSE, hoverinfo = "none") %>%
-      add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
-                y = mean(magVScomp$dataMagComp$percDiff) + 1.96*sd(magVScomp$dataMagComp$percDiff),
-                type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
-                showlegend = FALSE, hoverinfo = "none") %>%
-      add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
-                y = mean(magVScomp$dataMagComp$percDiff) - 1.96*sd(magVScomp$dataMagComp$percDiff),
-                type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
-                showlegend = FALSE, hoverinfo = "none") %>%
-      layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff)-10,
-                                text=paste("Mean = ",signif(mean(magVScomp$dataMagComp$percDiff),3)),
-                                showarrow = FALSE, font = list(size=12, color="black"))) %>%
-      layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff) + 1.96*sd(magVScomp$dataMagComp$percDiff) + 10,
-                                text=paste("Mean+1.96SD = ",signif(mean(magVScomp$dataMagComp$percDiff)+1.96*sd(magVScomp$dataMagComp$percDiff),3)),
-                                showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
-      layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff) - 1.96*sd(magVScomp$dataMagComp$percDiff) - 10,
-                                text=paste("Mean-1.96SD = ",signif(mean(magVScomp$dataMagComp$percDiff)-1.96*sd(magVScomp$dataMagComp$percDiff),3)),
-                                showarrow = FALSE, font = list(size=12, color="firebrick")))
-    
+    if (input$typeComparison == "Difference (%)"){
+      plot_ly(magVScomp$dataMagComp) %>%
+        add_trace(magVScomp$dataMagComp, x = ~average, y = ~percDiff, color = ~as.factor(sid), 
+                  colors = MagCom_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                  hoverinfo = 'text',
+                  text = ~paste('<br> Difference (%): ', signif(percDiff,4),
+                                '<br> Average T1 (ms): ', signif(average,5),
+                                '<BR> Reference T1 (ms): ', signif(refT1,5),
+                                '<br> ID: ', sid)) %>%
+        layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100)),
+               yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(unname(apply(magVScomp$dataMagComp,2,min))[5]-20,unname(apply(magVScomp$dataMagComp,2,max))[5]+20)),
+               legend = list(title=list(text="<b>Site ID</b>"))) %>%
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100), y = mean(magVScomp$dataMagComp$percDiff),
+                  type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
+                  showlegend = FALSE, hoverinfo = "none") %>%
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+                  y = mean(magVScomp$dataMagComp$percDiff) + 1.96*sd(magVScomp$dataMagComp$percDiff),
+                  type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                  showlegend = FALSE, hoverinfo = "none") %>%
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+                  y = mean(magVScomp$dataMagComp$percDiff) - 1.96*sd(magVScomp$dataMagComp$percDiff),
+                  type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                  showlegend = FALSE, hoverinfo = "none") %>%
+        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff)-10,
+                                  text=paste("Mean = ",signif(mean(magVScomp$dataMagComp$percDiff),3)),
+                                  showarrow = FALSE, font = list(size=12, color="black"))) %>%
+        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff) + 1.96*sd(magVScomp$dataMagComp$percDiff) + 10,
+                                  text=paste("Mean+1.96SD = ",signif(mean(magVScomp$dataMagComp$percDiff)+1.96*sd(magVScomp$dataMagComp$percDiff),3)),
+                                  showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
+        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff) - 1.96*sd(magVScomp$dataMagComp$percDiff) - 10,
+                                  text=paste("Mean-1.96SD = ",signif(mean(magVScomp$dataMagComp$percDiff)-1.96*sd(magVScomp$dataMagComp$percDiff),3)),
+                                  showarrow = FALSE, font = list(size=12, color="firebrick")))
+    }
+    else if (input$typeComparison == "Difference"){
+      plot_ly(magVScomp$dataMagComp) %>%
+        add_trace(magVScomp$dataMagComp, x = ~average, y = ~diff, color = ~as.factor(sid), 
+                  colors = MagCom_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
+                  hoverinfo = 'text',
+                  text = ~paste('<br> Difference (ms): ', signif(diff,4),
+                                '<br> Average T1 (ms): ', signif(average,5),
+                                '<BR> Reference T1 (ms): ', signif(refT1,5),
+                                '<br> ID: ', sid)) %>%
+        layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100)),
+               yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(unname(apply(magVScomp$dataMagComp,2,min))[4]-20,unname(apply(magVScomp$dataMagComp,2,max))[4]+20)),
+               legend = list(title=list(text="<b>Site ID</b>"))) %>%
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100), y = mean(magVScomp$dataMagComp$diff),
+                  type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
+                  showlegend = FALSE, hoverinfo = "none") %>%
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+                  y = mean(magVScomp$dataMagComp$diff) + 1.96*sd(magVScomp$dataMagComp$diff),
+                  type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                  showlegend = FALSE, hoverinfo = "none") %>%
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+                  y = mean(magVScomp$dataMagComp$diff) - 1.96*sd(magVScomp$dataMagComp$diff),
+                  type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
+                  showlegend = FALSE, hoverinfo = "none") %>%
+        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$diff)-10,
+                                  text=paste("Mean = ",signif(mean(magVScomp$dataMagComp$diff),3)),
+                                  showarrow = FALSE, font = list(size=12, color="black"))) %>%
+        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$diff) + 1.96*sd(magVScomp$dataMagComp$diff) + 10,
+                                  text=paste("Mean+1.96SD = ",signif(mean(magVScomp$dataMagComp$diff)+1.96*sd(magVScomp$dataMagComp$diff),3)),
+                                  showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
+        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$diff) - 1.96*sd(magVScomp$dataMagComp$diff) - 10,
+                                  text=paste("Mean-1.96SD = ",signif(mean(magVScomp$dataMagComp$diff)-1.96*sd(magVScomp$dataMagComp$diff),3)),
+                                  showarrow = FALSE, font = list(size=12, color="firebrick")))
+    }
   })
   
   sphere_colors <- setNames(rainbow(14), unique(signif(magVScomp$dataCorr$refT1,5)))
@@ -1085,40 +1125,78 @@ server <- function(input, output) {
   maxY = as.numeric(unname(apply(compNISTHuman,2,max, na.rm=T))[5])
   maxSampleSize = as.numeric(unname(apply(compNISTHuman,2,max, na.rm=T))[7])
   
-  output$NISTHumanStats_np <- renderPlotly({
-    plot_ly(compNISTHuman_nist$data_NIST) %>%
-      add_trace(compNISTHuman_nist$data_NIST, x = ~Mean, y = ~Std, color = ~Site_name,
-                colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~szSample*30/maxSampleSize),
-                hoverinfo = 'text',
-                text = ~paste('<br> STD (ms): ', signif(Std,4),
-                              '<br> Mean (ms): ', signif(Mean,5),
-                              '<br> CoV (%): ', signif(100*Std/Mean,4),
-                              '<br> Reference T1 (ms): ', signif(t1ROI,5),
-                              '<br> Sample size: ', szSample,
-                              '<br> Site ID: ', Site)) %>%
-      layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,maxX+100)),
-             yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,maxY+100)),
-             legend = list(title=list(text="<b>Site ID</b>")))
+  output$NISTHumanCOV_STD_np <- renderPlotly({
+    if (input$cov_std == "Coefficient of variation"){
+      plot_ly(compNISTHuman_nist$data_NIST) %>%
+        add_trace(compNISTHuman_nist$data_NIST, x = ~Mean, y = ~100*Std/Mean, color = ~Site_name,
+                  colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~szSample*30/maxSampleSize),
+                  hoverinfo = 'text',
+                  text = ~paste('<br> CoV (%): ', signif(100*Std/Mean,4),
+                                '<br> STD (ms): ', signif(Std,4),
+                                '<br> Mean (ms): ', signif(Mean,5),
+                                '<br> Reference T1 (ms): ', signif(t1ROI,5),
+                                '<br> Sample size: ', szSample,
+                                '<br> Site ID: ', Site)) %>%
+        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,maxX+100)),
+               yaxis = list(title=list(text="Coefficient of variation (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,300)),
+               legend = list(title=list(text="<b>Site ID</b>")))
+    }
+    else if (input$cov_std == "Standard deviation"){
+      plot_ly(compNISTHuman_nist$data_NIST) %>%
+        add_trace(compNISTHuman_nist$data_NIST, x = ~Mean, y = ~Std, color = ~Site_name,
+                  colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~szSample*30/maxSampleSize),
+                  hoverinfo = 'text',
+                  text = ~paste('<br> STD (ms): ', signif(Std,4),
+                                '<br> Mean (ms): ', signif(Mean,5),
+                                '<br> CoV (%): ', signif(100*Std/Mean,4),
+                                '<br> Reference T1 (ms): ', signif(t1ROI,5),
+                                '<br> Sample size: ', szSample,
+                                '<br> Site ID: ', Site)) %>%
+        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,maxX+100)),
+               yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,maxY+100)),
+               legend = list(title=list(text="<b>Site ID</b>")))
+    }
   })
   
-  output$NISTHumanStats_h <- renderPlotly({
-    plot_ly(compNISTHuman_human$data_human) %>%
-      add_trace(compNISTHuman_human$data_human, x = ~Mean, y = ~Std, color = ~Site_name,
-                colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~szSample*30/maxSampleSize),
-                hoverinfo = 'text',
-                text = ~paste('<br> STD (ms): ', signif(Std,4),
-                              '<br> Mean (ms): ', signif(Mean,5),
-                              '<br> CoV (%): ', signif(100*Std/Mean,4),
-                              '<br> ROI: ', t1ROI,
-                              '<br> Sample size: ', szSample,
-                              '<br> Site ID: ', Site)) %>%
-      layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,maxX+100)),
-             yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,maxY+100)),
-             legend = list(title=list(text="<b>Site ID</b>")))
+  output$NISTHumanCOV_STD_h <- renderPlotly({
+    if (input$cov_std == "Coefficient of variation"){
+      plot_ly(compNISTHuman_human$data_human) %>%
+        add_trace(compNISTHuman_human$data_human, x = ~Mean, y = ~100*Std/Mean, color = ~Site_name,
+                  colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~szSample*30/maxSampleSize),
+                  hoverinfo = 'text',
+                  text = ~paste('<br> CoV (%): ', signif(100*Std/Mean,4),
+                                '<br> STD (ms): ', signif(Std,4),
+                                '<br> Mean (ms): ', signif(Mean,5),
+                                '<br> ROI: ', t1ROI,
+                                '<br> Sample size: ', szSample,
+                                '<br> Site ID: ', Site)) %>%
+        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,maxX+100)),
+               yaxis = list(title=list(text="Coefficient of variation (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,300)),
+               legend = list(title=list(text="<b>Site ID</b>")))
+    }
+    else if (input$cov_std == "Standard deviation"){
+      plot_ly(compNISTHuman_human$data_human) %>%
+        add_trace(compNISTHuman_human$data_human, x = ~Mean, y = ~Std, color = ~Site_name,
+                  colors = c('blue','red'), type = 'scatter', mode = 'markers', marker = list(size = ~szSample*30/maxSampleSize),
+                  hoverinfo = 'text',
+                  text = ~paste('<br> STD (ms): ', signif(Std,4),
+                                '<br> Mean (ms): ', signif(Mean,5),
+                                '<br> CoV (%): ', signif(100*Std/Mean,4),
+                                '<br> ROI: ', t1ROI,
+                                '<br> Sample size: ', szSample,
+                                '<br> Site ID: ', Site)) %>%
+        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,maxX+100)),
+               yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+                            range=list(0,maxY+100)),
+               legend = list(title=list(text="<b>Site ID</b>")))
+    }
   })
 }
 
