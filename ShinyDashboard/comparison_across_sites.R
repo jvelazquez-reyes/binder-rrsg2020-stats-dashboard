@@ -22,7 +22,12 @@ comparison_across_sites <- function(site){
       
       #For non-voxelwise
       meanSite[numSpheres,j] = mean(siteData)
-      sdSite[numSpheres,j] = sd(siteData)
+      if (length(site)>1){
+        sdSite[numSpheres,j] = sd(siteData)
+      }
+      else{
+        sdSite[numSpheres,j] = 0
+      }
       
       #Pixelwise
       sid_long <- as.matrix(rep(id,length(siteData)))

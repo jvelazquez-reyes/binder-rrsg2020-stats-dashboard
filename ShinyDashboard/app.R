@@ -97,11 +97,11 @@ ui <- dashboardPage(skin = "blue",
                         multiple = FALSE
                       )),
                   
-                  box(title="Correlation Magnitude/Complex (mean values)", width=5, solidHeader=TRUE, status="warning",
-                      plotlyOutput(outputId = "CorrMagComp")),
+                  box(title="Correlation Magnitude/Complex (mean values)", width=5, solidHeader=TRUE,
+                      collapsible=TRUE, collapsed=TRUE, status="warning", plotlyOutput(outputId = "CorrMagComp")),
                   
-                  box(title="Correlation coefficients Magnitude/Complex (mean values)", width=2, solidHeader=TRUE, status="warning",
-                      tableOutput(outputId = "PearsonCorr"))
+                  box(title="Correlation coefficients Magnitude/Complex (mean values)", width=2, solidHeader=TRUE,
+                      status="warning", collapsible=TRUE, collapsed=TRUE, tableOutput(outputId = "PearsonCorr"))
                   ),
                 
                 fluidRow(
@@ -122,13 +122,11 @@ ui <- dashboardPage(skin = "blue",
                 
                 fluidRow(
                   column(2),
-                  box(title="Correlation Magnitude/Complex (all sites - all datapoints)", width=5, solidHeader=TRUE, 
-                      collapsible=TRUE, status="warning",
-                      plotlyOutput(outputId = "DispAllPointsMagComp_allSites")),
+                  box(title="Correlation Magnitude/Complex (all sites - all datapoints)", width=5, 
+                      solidHeader=TRUE, status="warning", plotlyOutput(outputId = "DispAllPointsMagComp_allSites")),
                   
                   box(title="Correlation coefficients Magnitude/Complex (all sites - all datapoints)", width=3, 
-                      collapsible=TRUE, solidHeader=TRUE, status="warning",
-                      tableOutput(outputId = "PearsonAllPointsMagComp_allSites"))
+                      solidHeader=TRUE, status="warning", tableOutput(outputId = "PearsonAllPointsMagComp_allSites"))
                 )
         ),
         
@@ -208,32 +206,38 @@ ui <- dashboardPage(skin = "blue",
                   tabPanel(title="Hierarchical Shift Function (HSF)",
                            h2("HSF with bootstrapped confidence intervals"),
                            fluidRow(
-                             box(width=4, plotlyOutput(outputId = "HSF1")),
-                             box(width=4, plotlyOutput(outputId = "HSF2")),
-                             box(width=4, plotlyOutput(outputId = "HSF3"))
+                             box(width=6, plotlyOutput(outputId = "HSF1")),
+                             box(width=6, plotlyOutput(outputId = "HSF2"))
                            ),
                            
                            fluidRow(
-                             box(width=4, plotlyOutput(outputId = "HSF4")),
-                             box(width=4, plotlyOutput(outputId = "HSF5")),
-                             box(width=4, plotlyOutput(outputId = "HSF6"))
+                             box(width=6, plotlyOutput(outputId = "HSF3")),
+                             box(width=6, plotlyOutput(outputId = "HSF4"))
                            ),
                            
                            fluidRow(
-                             box(width=4, plotlyOutput(outputId = "HSF7")),
-                             box(width=4, plotlyOutput(outputId = "HSF8")),
-                             box(width=4, plotlyOutput(outputId = "HSF9"))
+                             box(width=6, plotlyOutput(outputId = "HSF5")),
+                             box(width=6, plotlyOutput(outputId = "HSF6"))
                            ),
                            
                            fluidRow(
-                             box(width=4, plotlyOutput(outputId = "HSF10")),
-                             box(width=4, plotlyOutput(outputId = "HSF11")),
-                             box(width=4, plotlyOutput(outputId = "HSF12"))
+                             box(width=6, plotlyOutput(outputId = "HSF7")),
+                             box(width=6, plotlyOutput(outputId = "HSF8"))
                            ),
                            
                            fluidRow(
-                             box(width=4, plotlyOutput(outputId = "HSF13")),
-                             box(width=4, plotlyOutput(outputId = "HSF14"))
+                             box(width=6, plotlyOutput(outputId = "HSF9")),
+                             box(width=6, plotlyOutput(outputId = "HSF10"))
+                           ),
+                           
+                           fluidRow(
+                             box(width=6, plotlyOutput(outputId = "HSF11")),
+                             box(width=6, plotlyOutput(outputId = "HSF12"))
+                           ),
+                           
+                           fluidRow(
+                             box(width=6, plotlyOutput(outputId = "HSF13")),
+                             box(width=6, plotlyOutput(outputId = "HSF14"))
                            )
                            )
                 )
@@ -341,12 +345,11 @@ server <- function(input, output) {
   })
   
   ###MAGNITUDE VS COMPLEX ANALYSIS###
-  MagCom_colors <- setNames(magma(length(cases)), unique(magVScomp$dataMagComp$sid))
+  MagCom_colors <- setNames(viridis(length(cases)), unique(magVScomp$dataMagComp$sid))
   output$MagComp <- renderPlotly({
     if (input$typeComparison == "Difference"){
       plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~abs(diff), split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
         filter(sid %in% input$DiffSitesID) %>%
-        #group_by(sid) %>%
         add_trace(type = 'scatter', mode = 'lines+markers',
                   hoverinfo = 'text',
                   text = ~paste('<br> Site: ', sid,
@@ -360,7 +363,6 @@ server <- function(input, output) {
     else if (input$typeComparison == "Difference (%)"){
       plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~abs(percDiff), split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
         filter(sid %in% input$DiffSitesID) %>%
-        #group_by(sid) %>%
         add_trace(type = 'scatter', mode = 'lines+markers',
                   hoverinfo = 'text',
                   text = ~paste('<br> Site: ', sid,
@@ -538,9 +540,10 @@ server <- function(input, output) {
   output$PearsonAllPointsMagComp_allSites <- renderTable({corr_per_sphere})
   
   ###NIST PHANTOM (MEASURED VS REFRENCE T1 ANALYSIS)###
-  sitesFiltered_colors <- setNames(plasma(length(filteredSites)), unique(MeasSites$dataSite$ID_Site))
+  sitesFiltered_colors <- setNames(viridis(length(filteredSites)), unique(MeasSites$dataSite$ID_Site))
   output$CompFiltSites <- renderPlotly({
-    plot_ly(MeasSites$dataSite, x = ~refT1, y = ~Mean, split = ~ID_Site, color = ~ID_Site, colors = sitesFiltered_colors) %>%
+    plot_ly(MeasSites$dataSite, x = ~refT1, y = ~Mean, split = ~ID_Site, color = ~ID_Site, colors = sitesFiltered_colors,
+            error_y = ~list(array = Std, color = '#000000')) %>%
       filter(sid %in% input$FiltSitesID) %>%
       add_trace(type = 'scatter', mode = 'lines+markers',
                 hoverinfo = 'text',
@@ -556,7 +559,7 @@ server <- function(input, output) {
   })
   
   output$sdFilteredSites <- renderPlotly({
-    sdFiltered_colors <- setNames(rainbow(length(filteredSites)), unique(sdFilteredSites$stdData$ID_Site))
+    sdFiltered_colors <- setNames(viridis(length(filteredSites)), unique(sdFilteredSites$stdData$ID_Site))
     plot_ly(sdFilteredSites$stdData, x = ~reference, y = ~stdValues/reference, split = ~ID_Site, color = ~ID_Site, colors = sdFiltered_colors) %>%
       filter(sid %in% input$FiltSitesID) %>%
       add_trace(type = 'scatter', mode = 'lines+markers',
@@ -588,7 +591,7 @@ server <- function(input, output) {
       DispersionAllPoints = SiteAustralia
     }
     
-    specSite_colors <- setNames(rainbow(length(unique(DispersionAllPoints$dataSite_long$ID_Site_long))), unique(DispersionAllPoints$dataSite_long$ID_Site_long))
+    specSite_colors <- setNames(viridis(length(unique(DispersionAllPoints$dataSite_long$ID_Site_long))), unique(DispersionAllPoints$dataSite_long$ID_Site_long))
     plot_ly(DispersionAllPoints$dataSite_long) %>%
       add_trace(DispersionAllPoints$dataSite_long, x = ~t1_long, y = ~siteData, color = ~ID_Site_long,
                 colors = specSite_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
@@ -623,7 +626,7 @@ server <- function(input, output) {
       RefVSMeas = measuredT1_against_referenceT1(scans = Australia)
     }
     
-    sitesFiltBA_colors <- setNames(rainbow(length(unique(RefVSMeas$BAData$ID_Site))), unique(RefVSMeas$BAData$ID_Site))
+    sitesFiltBA_colors <- setNames(viridis(length(unique(RefVSMeas$BAData$ID_Site))), unique(RefVSMeas$BAData$ID_Site))
     plot_ly(RefVSMeas$BAData) %>%
       add_trace(RefVSMeas$BAData, x = ~reference, y = ~measValue, color = ~ID_Site, 
                 colors = sitesFiltBA_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
@@ -657,7 +660,7 @@ server <- function(input, output) {
       RefVSMeas = measuredT1_against_referenceT1(scans = Australia)
     }
     
-    sitesFiltBA_colors <- setNames(rainbow(length(unique(RefVSMeas$BAData$ID_Site))), unique(RefVSMeas$BAData$ID_Site))
+    sitesFiltBA_colors <- setNames(viridis(length(unique(RefVSMeas$BAData$ID_Site))), unique(RefVSMeas$BAData$ID_Site))
     plot_ly(RefVSMeas$BAData) %>%
       add_trace(RefVSMeas$BAData, x = ~average, y = ~perc_difference, color = ~ID_Site, 
                 colors = sitesFiltBA_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
@@ -704,7 +707,7 @@ server <- function(input, output) {
       RefVSMeas = measuredT1_against_referenceT1(scans = Philips)
     }
     
-    vendorFiltBA_colors <- setNames(rainbow(length(unique(RefVSMeas$BAData$ID_Vendor))), unique(RefVSMeas$BAData$ID_Vendor))
+    vendorFiltBA_colors <- setNames(viridis(length(unique(RefVSMeas$BAData$ID_Vendor))), unique(RefVSMeas$BAData$ID_Vendor))
     plot_ly(RefVSMeas$BAData) %>%
       add_trace(RefVSMeas$BAData, x = ~reference, y = ~measValue, color = ~ID_Vendor, 
                 colors = vendorFiltBA_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
@@ -732,7 +735,7 @@ server <- function(input, output) {
       RefVSMeas = measuredT1_against_referenceT1(scans = Philips)
     }
     
-    vendorFiltBA_colors <- setNames(rainbow(length(unique(RefVSMeas$BAData$ID_Vendor))), unique(RefVSMeas$BAData$ID_Vendor))
+    vendorFiltBA_colors <- setNames(viridis(length(unique(RefVSMeas$BAData$ID_Vendor))), unique(RefVSMeas$BAData$ID_Vendor))
     plot_ly(RefVSMeas$BAData) %>%
       add_trace(RefVSMeas$BAData, x = ~average, y = ~perc_difference, color = ~ID_Vendor, 
                 colors = vendorFiltBA_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),
@@ -787,7 +790,7 @@ server <- function(input, output) {
     
     AcErrorAllPoints = subset(AcErrorAllPoints$dataSite_long, ac_error <= input$errorThr[2])
     
-    specSite_colors <- setNames(rainbow(length(unique(AcErrorAllPoints$ID_Site_long))), unique(AcErrorAllPoints$ID_Site_long))
+    specSite_colors <- setNames(viridis(length(unique(AcErrorAllPoints$ID_Site_long))), unique(AcErrorAllPoints$ID_Site_long))
     plot_ly(AcErrorAllPoints) %>%
       add_trace(AcErrorAllPoints, x = ~t1_long, y = ~ac_error, color = ~ID_Site_long,
                 colors = specSite_colors, type = 'scatter', mode = 'markers', marker = list(size = 8),

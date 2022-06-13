@@ -97,8 +97,8 @@ MeasSites <- comparison_across_sites(filteredSites)
 SiteGermany <- comparison_across_sites(Germany)
 SiteMontreal <- comparison_across_sites(Montreal)
 SiteUS <- comparison_across_sites(US)
-SiteLondon <- comparison_across_sites(London)
-SiteAustralia <- comparison_across_sites(Australia)
+SiteLondon <- suppressWarnings(comparison_across_sites(London))
+SiteAustralia <- suppressWarnings(comparison_across_sites(Australia))
 
 ##COMPARISON BETWEEN MEASURED AND REFERENCE T1 VALUES##
 source("measuredT1_against_referenceT1.R")

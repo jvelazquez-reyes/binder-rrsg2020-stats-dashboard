@@ -13,7 +13,7 @@ hierarchical_shift_function <- function(dataSites){
     np = length(uniqueSites) # Number of submissions of interest
     qseq <- seq(0.1,0.9,0.1) # quantiles
     alpha <- 0.05
-    nboot <- 1000 # bootstrap
+    nboot <- 750 # bootstrap
     tr <- 0.2 # group trimmed mean for each quantile
     nq <- length(qseq) #quantile length
     icrit <- round((1-alpha)*nboot) # 95th quantile
@@ -45,7 +45,7 @@ hierarchical_shift_function <- function(dataSites){
     df1.md <- tibble(difference = gptm,
                      quantile = qseq)
     
-    hsf_colors <- setNames(rainbow(length(uniqueSites)), unique(df1$site))
+    hsf_colors <- setNames(viridis(length(uniqueSites)), unique(df1$site))
     p <- plotly_plot <- plot_ly(df1) %>%
       add_trace(df1, x = ~quantile, y = ~difference, color = ~site, colors = hsf_colors,
                                 type = 'scatter', mode = 'markers+lines', marker = list(size = 5),
