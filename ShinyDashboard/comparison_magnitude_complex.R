@@ -72,7 +72,7 @@ comparison_magnitude_complex <- function(cases){
     
     ##CORRELATION ANALYSIS
     corrTest <- cor.test(meanMag[,j], meanComp[,j], method = 'pearson')
-    linTest <- epi.ccc(meanMag[,j], meanComp[,j])
+    linTest <- CCC(meanMag[,j], meanComp[,j])
     Pearson_test <- data.frame(id, corrTest$estimate, linTest[[1]][1])
     
     #DIFFERENCE AND PERCENTAGE DIFFERENCE

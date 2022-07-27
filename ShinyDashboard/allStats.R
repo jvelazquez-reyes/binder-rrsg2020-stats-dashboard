@@ -116,12 +116,6 @@ source("hierarchical_shift_function.R")
 dataSites <- MeasSites$dataSite_long
 HSFData <- hierarchical_shift_function(dataSites)
 
-##LINEAR MIXED EFFECTS MODEL##
-source("linear_mixed_effects_model.R")
-
-sites <- 1:6
-sitesLMEM <- linear_mixed_effects_model(sites)
-
 ##HUMAN DATASET##
 data2 <- read.csv("3T_human_T1maps_database.csv")
 data2[] <- gsub("[][]", "", as.matrix(data2))

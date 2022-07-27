@@ -1,4 +1,3 @@
-library("lme4")
 library("irr")
 library("sjPlot")
 library("plotly")
@@ -183,7 +182,7 @@ function(input, output) {
       corr_per_sphere$df[ii,1] = spheres[ii]
       corr_per_sphere$df[ii,2] = signif(refT1[ii],5)
       corr_per_sphere$df[ii,3] = cor(data_per_sphere$magData,data_per_sphere$compData)
-      corr_per_sphere$df[ii,4] = epi.ccc(data_per_sphere$magData,data_per_sphere$compData)[[1]][1]
+      corr_per_sphere$df[ii,4] = CCC(data_per_sphere$magData,data_per_sphere$compData)[[1]][1]
     }
     
     output$PearsonAllPointsMagComp_oneSite <- renderTable({corr_per_sphere$df})
@@ -216,7 +215,7 @@ function(input, output) {
     corr_per_sphere[ii,1] = spheres[ii]
     corr_per_sphere[ii,2] = signif(refT1[ii],5)
     corr_per_sphere[ii,3] = cor(data_per_sphere$magData,data_per_sphere$compData)
-    corr_per_sphere[ii,4] = epi.ccc(data_per_sphere$magData,data_per_sphere$compData)[[1]][1]
+    corr_per_sphere[ii,4] = CCC(data_per_sphere$magData,data_per_sphere$compData)[[1]][1]
   }
   
   output$PearsonAllPointsMagComp_allSites <- renderTable({corr_per_sphere})

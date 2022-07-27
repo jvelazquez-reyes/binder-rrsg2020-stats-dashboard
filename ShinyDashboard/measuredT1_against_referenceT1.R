@@ -78,7 +78,7 @@ measuredT1_against_referenceT1 <- function(scans){
     Pearson_test = cor(data2coef)
     
     #Lin's concordance correlation coefficient
-    Lin_test = epi.ccc(data2coef[,1], data2coef[,2])
+    Lin_test = CCC(data2coef[,1], data2coef[,2])
     
     correlations[j,1] = scans[j]
     correlations[j,2] = Pearson_test[1,2]
@@ -88,7 +88,7 @@ measuredT1_against_referenceT1 <- function(scans){
   #ICC(2,1): It reflects the variation between 2 or more raters who measure the same group of subjects.
   icc_test = icc(data4icc, model = "twoway", type = "agreement")
   Pearson_test2 = cor(BAData$measValue, BAData$reference)
-  Lin_test2 = epi.ccc(BAData$measValue, BAData$reference)
+  Lin_test2 = CCC(BAData$measValue, BAData$reference)
   correlations2[1,1] = Pearson_test2
   correlations2[1,2] = Lin_test2[[1]][1]
   #correlations2[1,3] = icc_test[7]
