@@ -1,9 +1,9 @@
 ##Call Python script from R##
 
 #Disable prompt to install miniconda
-Sys.setenv(RETICULATE_MINICONDA_ENABLED = "FALSE")
-reticulate::source_python('nist.py')
-#reticulate::source_python(paste(getwd(),"/nist.py", sep = ""))
+#Sys.setenv(RETICULATE_MINICONDA_ENABLED = "FALSE")
+#reticulate::source_python('nist.py')
+reticulate::source_python(paste(getwd(),"/nist.py", sep = ""))
 
 ##PHANTOM DATASET##
 data <- read.csv("3T_NIST_T1maps_database.csv")

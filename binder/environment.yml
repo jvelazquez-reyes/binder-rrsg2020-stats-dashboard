@@ -1,0 +1,24 @@
+channels:
+  - conda-forge
+dependencies:
+  - r-base=3.6
+  - numpy
+  - scipy
+  - r-reticulate
+  - r-metrics
+  - r-gridextra
+  - r-ggplot2
+  - r-hdinterval
+  - r-devtools
+  - r-tibble
+  - r-stringi
+  - r-desctools
+  - r-rjson
+  - r-viridis
+  - r-irr
+  - r-sjplot
+  - r-plotly
+  - r-shiny
+  - r-shinyjs
+  - r-shinythemes
+  - r-shinydashboard
