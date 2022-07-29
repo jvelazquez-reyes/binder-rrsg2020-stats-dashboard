@@ -1,7 +1,8 @@
 ##Call Python script from R##
 
 #Disable prompt to install miniconda
-#Sys.setenv(RETICULATE_MINICONDA_ENABLED = "FALSE")
+Sys.setenv(RETICULATE_MINICONDA_ENABLED = "FALSE")
+Sys.setenv(RETICULATE_PYTHON = "../my_env/bin/python")
 #reticulate::source_python('nist.py')
 reticulate::source_python(paste(getwd(),"/nist.py", sep = ""))
 

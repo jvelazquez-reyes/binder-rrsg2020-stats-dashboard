@@ -1,9 +1,8 @@
 channels:
   - conda-forge
 dependencies:
-  - r-base=3.6
-  - numpy
-  - scipy
+  - r-base=4.1.0
+  - virtualenv
   - r-reticulate
   - r-metrics
   - r-gridextra
