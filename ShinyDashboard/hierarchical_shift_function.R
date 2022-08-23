@@ -52,10 +52,10 @@ hierarchical_shift_function <- function(dataSites){
                                 text = ~paste('<br> Decile: ', quantile,
                                               '<br> Difference (ms): ', signif(difference,4),
                                               '<br> ID: ', id)) %>%
-      layout(xaxis = list(title=list(text="Deciles", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(0,1), tickvals=seq(0.1,0.9,0.1)),
-             yaxis = list(title=list(text="Reference - Measured T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(-300,300)),
+      layout(xaxis = list(title=list(text="Deciles", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, 
+                          linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,1), tickvals=seq(0.1,0.9,0.1)),
+             yaxis = list(title=list(text="Reference - Measured T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, 
+                          linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(-300,300)),
              legend = list(title=list(text="<b>Site ID</b>")),
              annotations = list(x=0.5, y=250, text=paste("Reference T1: ", signif(tempTitle[sph],5), " ms"),
                                 showarrow = FALSE, font = list(size=20, color="black"))) %>%
@@ -86,10 +86,10 @@ hierarchical_shift_function <- function(dataSites){
                 text = ~paste('<br> Decile: ', quantile,
                               '<br> Difference (ms): ', signif(difference,4),
                               '<br> ID: ', id)) %>%
-      layout(xaxis = list(title=list(text="Deciles", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,1), tickvals=seq(0.1,0.9,0.1)),
-             yaxis = list(title=list(text="Reference - Measured T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(-300,300)),
+      layout(xaxis = list(title=list(text="Deciles", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, 
+                          linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,1), tickvals=seq(0.1,0.9,0.1)),
+             yaxis = list(title=list(text="Reference - Measured T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, 
+                          linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(-300,300)),
              legend = list(title=list(text="<b>Site ID</b>")),
              annotations = list(x=0.5, y=250, text=paste("Reference T1: ", signif(tempTitle[sph],5), " ms"),
                                 showarrow = FALSE, font = list(size=20, color="black"))) %>%

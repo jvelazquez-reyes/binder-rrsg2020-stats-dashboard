@@ -36,8 +36,10 @@ function(input, output) {
                   text = ~paste('<br> Site: ', sid,
                                 '<br> Difference (ms): ', signif(abs(diff),3),
                                 '<br> Reference T1 (ms): ', signif(refT1,5))) %>%
-        layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-               yaxis = list(title=list(text="Difference (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+        layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+               yaxis = list(title=list(text="Difference (ms)", font=list(size=18)), tickfont=list(size=15),
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(0,unname(apply(abs(magVScomp$dataMagComp),2,max))[4]+5)),
                legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95))
     }
@@ -49,8 +51,10 @@ function(input, output) {
                   text = ~paste('<br> Site: ', sid,
                                 '<br> Difference (%): ', signif(abs(percDiff),4),
                                 '<br> Reference T1 (ms): ', signif(refT1,5))) %>%
-        layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-               yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+        layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+               yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15),
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(0,unname(apply(abs(magVScomp$dataMagComp),2,max))[5]+5)),
                legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95))
     }
@@ -66,9 +70,11 @@ function(input, output) {
                                 '<br> Average T1 (ms): ', signif(average,5),
                                 '<BR> Reference T1 (ms): ', signif(refT1,5),
                                 '<br> ID: ', sid)) %>%
-        layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+        layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, 
+                            showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100)),
-               yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+               yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F,
+                            showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(unname(apply(magVScomp$dataMagComp,2,min))[5]-20,unname(apply(magVScomp$dataMagComp,2,max))[5]+20)),
                legend = list(title=list(text="<b>Site ID</b>"))) %>%
         add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100), y = mean(magVScomp$dataMagComp$percDiff),
@@ -101,9 +107,11 @@ function(input, output) {
                                 '<br> Average T1 (ms): ', signif(average,5),
                                 '<BR> Reference T1 (ms): ', signif(refT1,5),
                                 '<br> ID: ', sid)) %>%
-        layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+        layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, 
+                            showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100)),
-               yaxis = list(title=list(text="Difference (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+               yaxis = list(title=list(text="Difference (ms)", font=list(size=18)), tickfont=list(size=15),
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(unname(apply(magVScomp$dataMagComp,2,min))[4]-20,unname(apply(magVScomp$dataMagComp,2,max))[4]+20)),
                legend = list(title=list(text="<b>Site ID</b>"))) %>%
         add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100), y = mean(magVScomp$dataMagComp$diff),
@@ -140,9 +148,11 @@ function(input, output) {
                               '<br> Magnitude (ms): ', signif(Magnitude,5),
                               '<br> Reference T1 (ms): ', signif(refT1,5),
                               '<br> ID: ', sid)) %>%
-      layout(xaxis = list(title=list(text="Complex T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Complex T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,unname(apply(magVScomp$dataCorr,2,max))[5]+100)),
-             yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+             yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,unname(apply(magVScomp$dataCorr,2,max))[4]+100)),
              legend = list(title=list(text="<b>Reference T1 (ms)</b>"))) %>%
       add_trace(x = c(0, unname(apply(magVScomp$dataCorr,2,max))[5]+100), y = c(0, unname(apply(magVScomp$dataCorr,2,max))[4]+100),
@@ -161,9 +171,11 @@ function(input, output) {
                               '<br> Magnitude (ms): ', signif(magData,5),
                               '<br> Reference T1 (ms): ', signif(refT1_long,5),
                               '<br> ID: ', sid_long)) %>%
-      layout(xaxis = list(title=list(text="Complex T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Complex T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, 
+                          showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,unname(apply(magVScomp$PearsonCorrSphere,2,max))[5]+100)),
-             yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+             yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,unname(apply(magVScomp$PearsonCorrSphere,2,max))[4]+100)),
              legend = list(title=list(text="<b>Reference T1 (ms)</b>"))) %>%
       add_trace(x = c(0, unname(apply(magVScomp$PearsonCorrSphere,2,max))[5]+100), y = c(0, unname(apply(magVScomp$PearsonCorrSphere,2,max))[4]+100),
@@ -197,9 +209,11 @@ function(input, output) {
                               '<br> Magnitude (ms): ', signif(magData,5),
                               '<br> Reference T1 (ms): ', signif(refT1_long,5),
                               '<br> ID: ', sid_long)) %>%
-      layout(xaxis = list(title=list(text="Complex T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Complex T1 value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,unname(apply(magVScomp$PearsonCorrSphere,2,max))[5]+100)),
-             yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+             yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,unname(apply(magVScomp$PearsonCorrSphere,2,max))[4]+100)),
              legend = list(title=list(text="<b>Reference T1 (ms)</b>"))) %>%
       add_trace(x = c(0, unname(apply(magVScomp$PearsonCorrSphere,2,max))[5]+100), y = c(0, unname(apply(magVScomp$PearsonCorrSphere,2,max))[4]+100),
@@ -232,9 +246,11 @@ function(input, output) {
                               '<br> Measured T1: ', signif(Mean,6),
                               '<br> Reference T1: ', signif(refT1,6),
                               '<br> Sphere: ', Sphere)) %>%
-      layout(xaxis = list(title=list(text="Reference T1 value (ms)",font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Reference T1 value (ms)",font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(MeasSites$dataSite,2,max))[4])+100)),
-             yaxis = list(title=list(text="Mean T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+             yaxis = list(title=list(text="Mean T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(MeasSites$dataSite,2,max))[5])+100)),
              legend = list(title=list(text="<b>Site ID</b>")))
   })
@@ -249,9 +265,10 @@ function(input, output) {
                               '<br> SD: ', signif(stdValues,3),
                               '<br> Reference T1: ', signif(reference,5),
                               '<br> Site: ', ID_Site)) %>%
-      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="SD/Reference T1", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,0.2)),
+      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="SD/Reference T1", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,0.2)),
              legend = list(title=list(text="<b>Site ID</b>")))
   })
   
@@ -280,9 +297,11 @@ function(input, output) {
                 text = ~paste('<br> Measured T1 value (ms): ', signif(siteData,5),
                               '<br> Reference T1 value (ms): ', signif(t1_long,5),
                               '<br> ID: ', sid_long)) %>%
-      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[4])+100)),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[5])+100)),
              legend = list(title=list(text="</b>Site ID</b>"))) %>%
       add_trace(x = c(0, as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[4])+100),
@@ -315,9 +334,11 @@ function(input, output) {
                 text = ~paste('<br> Measured T1 value (ms): ', signif(measValue,5),
                               '<br> Reference T1 value (ms): ', signif(reference,5),
                               '<br> Sphere: ', sph)) %>%
-      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100)),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100)),
              legend = list(title=list(text="<b>Site ID</b>"))) %>%
       add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100), y = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100),
@@ -350,9 +371,11 @@ function(input, output) {
                               '<br> Average T1: ', signif(average,5),
                               '<BR> Reference T1: ', signif(reference,5),
                               '<br> Sphere: ', sph)) %>%
-      layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100)),
-             yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+             yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(-40,40)),
              legend = list(title=list(text="<b>Site ID</b>"))) %>%
       add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100), y = mean(RefVSMeas$BAData$perc_difference),
@@ -396,9 +419,11 @@ function(input, output) {
                 text = ~paste('<br> Measured T1 value (ms): ', signif(measValue,5),
                               '<br> Reference T1 value (ms): ', signif(reference,5),
                               '<br> Sphere: ', sph)) %>%
-      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100)),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100)),
              legend = list(title=list(text="<b>MRI vendor</b>"))) %>%
       add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100), y = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100),
@@ -425,10 +450,11 @@ function(input, output) {
                               '<br> Average T1: ', signif(average,5),
                               '<BR> Reference T1: ', signif(reference,5),
                               '<br> Sphere: ', sph)) %>%
-      layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100)),
-             yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(-40,40)),
+             yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(-40,40)),
              legend = list(title=list(text="<b>MRI vendor</b>"))) %>%
       add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100), y = mean(RefVSMeas$BAData$perc_difference),
                 type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
@@ -479,10 +505,11 @@ function(input, output) {
                 text = ~paste('<br> Accuracy Error (%): ', signif(ac_error,5),
                               '<br> Reference T1 value (ms): ', signif(t1_long,5),
                               '<br> ID: ', sid_long)) %>%
-      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Reference T1 value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(AcErrorAllPoints,2,max))[4])+100)),
-             yaxis = list(title=list(text="Accuracy Error (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(0,60)),
+             yaxis = list(title=list(text="Accuracy Error (%)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,60)),
              legend = list(title=list(text="<bSite ID</b>")))
   })
   
@@ -511,8 +538,10 @@ function(input, output) {
                 text = ~paste0('<br> Measured value: ', signif(siteData,5),
                                '<br>ROI: ', roi_long,
                                '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
-      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
              legend = list(title=list(text="<b>ROI</b>")))
@@ -525,8 +554,10 @@ function(input, output) {
                 text = ~paste0('<br> Measured value: ', signif(siteData,5),
                                '<br>ROI: ', roi_long,
                                '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
-      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
              legend = list(title=list(text="<b>ROI</b>")))
@@ -539,8 +570,10 @@ function(input, output) {
                 text = ~paste0('<br> Measured value: ', signif(siteData,5),
                                '<br>ROI: ', roi_long,
                                '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
-      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
              legend = list(title=list(text="<b>ROI</b>")))
@@ -555,8 +588,10 @@ function(input, output) {
                 text = ~paste0('<br> Measured value: ', signif(siteData,5),
                                '<br>ROI: ', roi_long,
                                '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
-      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
              legend = list(title=list(text="<b>ROI</b>")))
@@ -569,8 +604,10 @@ function(input, output) {
                 text = ~paste0('<br> Measured value: ', signif(siteData,5),
                                '<br>ROI: ', roi_long,
                                '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
-      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
              legend = list(title=list(text="<b>ROI</b>")))
@@ -583,8 +620,10 @@ function(input, output) {
                 text = ~paste0('<br> Measured value: ', signif(siteData,5),
                                '<br>ROI: ', roi_long,
                                '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
-      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
              legend = list(title=list(text="<b>ROI</b>")))
@@ -597,8 +636,10 @@ function(input, output) {
                 text = ~paste0('<br> Measured value: ', signif(siteData,5),
                                '<br>ROI: ', roi_long,
                                '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
-      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
              legend = list(title=list(text="<b>ROI</b>")))
@@ -618,8 +659,10 @@ function(input, output) {
                 text = ~paste0('<br> Measured value: ', signif(siteData,5),
                                '<br>ROI: ', roi_long,
                                '<br>SID: ', factor(sid_long)), showlegend = FALSE) %>%
-      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman_Mexico$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman_Mexico$dataLong_human,2,max))[6])+100)),
              legend = list(title=list(text="<b>ROI</b>")))
@@ -634,9 +677,10 @@ function(input, output) {
                 text = ~paste('<br> Site: ', Site,
                               '<br> Difference (%): ', signif(dif,4),
                               '<br> ROI: ', roi_lab)) %>%
-      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                          range=list(-30,70)),
+      layout(xaxis = list(title=list(text="Region of Interest", font=list(size=18)), tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(-30,70)),
              legend = list(title=list(text="<b>Site ID</b>")))
   })
   
@@ -649,8 +693,10 @@ function(input, output) {
                 text = ~paste('<br> Site: ', sid_long,
                               '<br> ROI: ', roi_long,
                               '<br> T1 value: ', signif(siteData,5))) %>%
-      layout(xaxis = list(title=list(text="Age (years)", font=list(size=18)), categoryarray = ~names, categoryorder = "array", tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T),
-             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
+      layout(xaxis = list(title=list(text="Age (years)", font=list(size=18)), categoryarray = ~names, categoryorder = "array", tickfont=list(size=15), 
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
+             yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
+                          zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
              legend = list(title=list(text="<b>ROI</b>")))
     
@@ -673,10 +719,10 @@ function(input, output) {
                                 '<br> Reference T1 (ms): ', signif(t1ROI,5),
                                 '<br> Sample size: ', szSample,
                                 '<br> Site ID: ', Site)) %>%
-        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(0,maxX+100)),
-               yaxis = list(title=list(text="Coefficient of variation (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(0,300)),
+        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxX+100)),
+               yaxis = list(title=list(text="Coefficient of variation (%)", font=list(size=18)), tickfont=list(size=15), 
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,300)),
                legend = list(title=list(text="<b>Site ID</b>")))
     }
     else if (input$cov_std == "Standard deviation"){
@@ -690,10 +736,10 @@ function(input, output) {
                                 '<br> Reference T1 (ms): ', signif(t1ROI,5),
                                 '<br> Sample size: ', szSample,
                                 '<br> Site ID: ', Site)) %>%
-        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(0,maxX+100)),
-               yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(0,maxY+100)),
+        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxX+100)),
+               yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), 
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxY+100)),
                legend = list(title=list(text="<b>Site ID</b>")))
     }
   })
@@ -710,10 +756,10 @@ function(input, output) {
                                 '<br> ROI: ', t1ROI,
                                 '<br> Sample size: ', szSample,
                                 '<br> Site ID: ', Site)) %>%
-        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(0,maxX+100)),
-               yaxis = list(title=list(text="Coefficient of variation (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(0,300)),
+        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxX+100)),
+               yaxis = list(title=list(text="Coefficient of variation (%)", font=list(size=18)), tickfont=list(size=15), 
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,300)),
                legend = list(title=list(text="<b>Site ID</b>")))
     }
     else if (input$cov_std == "Standard deviation"){
@@ -727,10 +773,10 @@ function(input, output) {
                                 '<br> ROI: ', t1ROI,
                                 '<br> Sample size: ', szSample,
                                 '<br> Site ID: ', Site)) %>%
-        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(0,maxX+100)),
-               yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T,
-                            range=list(0,maxY+100)),
+        layout(xaxis = list(title=list(text="Mean value (ms)", font=list(size=18)), tickfont=list(size=15), 
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxX+100)),
+               yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15),
+                            zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxY+100)),
                legend = list(title=list(text="<b>Site ID</b>")))
     }
   })
