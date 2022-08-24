@@ -41,7 +41,7 @@ function(input, output) {
                yaxis = list(title=list(text="Difference (ms)", font=list(size=18)), tickfont=list(size=15),
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(0,unname(apply(abs(magVScomp$dataMagComp),2,max))[4]+5)),
-               legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95))
+               legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95, bgcolor = "rgba(0,0,0,0)"))
     }
     else if (input$typeComparison == "Difference (%)"){
       plot_ly(magVScomp$dataMagComp, x = ~refT1, y = ~abs(percDiff), split = ~as.factor(sid), color = ~as.factor(sid), colors = MagCom_colors) %>%
@@ -56,7 +56,7 @@ function(input, output) {
                yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15),
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(0,unname(apply(abs(magVScomp$dataMagComp),2,max))[5]+5)),
-               legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95))
+               legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95, bgcolor = "rgba(0,0,0,0)"))
     }
   })
   
@@ -72,29 +72,29 @@ function(input, output) {
                                 '<br> ID: ', sid)) %>%
         layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, 
                             showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
-                            range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100)),
+                            range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+600)),
                yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15), zeroline=F,
                             showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(unname(apply(magVScomp$dataMagComp,2,min))[5]-20,unname(apply(magVScomp$dataMagComp,2,max))[5]+20)),
-               legend = list(title=list(text="<b>Site ID</b>"))) %>%
-        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100), y = mean(magVScomp$dataMagComp$percDiff),
+               legend = list(title=list(text="<b>Site ID</b>"), x=0.85, y=0.95, bgcolor = "rgba(0,0,0,0)")) %>%
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+600), y = mean(magVScomp$dataMagComp$percDiff),
                   type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
                   showlegend = FALSE, hoverinfo = "none") %>%
-        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+600),
                   y = mean(magVScomp$dataMagComp$percDiff) + 1.96*sd(magVScomp$dataMagComp$percDiff),
                   type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
                   showlegend = FALSE, hoverinfo = "none") %>%
-        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+600),
                   y = mean(magVScomp$dataMagComp$percDiff) - 1.96*sd(magVScomp$dataMagComp$percDiff),
                   type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
                   showlegend = FALSE, hoverinfo = "none") %>%
-        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff)-10,
+        layout(annotations = list(x=1400, y=mean(magVScomp$dataMagComp$percDiff)-10,
                                   text=paste("Mean = ",signif(mean(magVScomp$dataMagComp$percDiff),3)),
                                   showarrow = FALSE, font = list(size=12, color="black"))) %>%
-        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff) + 1.96*sd(magVScomp$dataMagComp$percDiff) + 10,
+        layout(annotations = list(x=1400, y=mean(magVScomp$dataMagComp$percDiff) + 1.96*sd(magVScomp$dataMagComp$percDiff) + 10,
                                   text=paste("Mean+1.96SD = ",signif(mean(magVScomp$dataMagComp$percDiff)+1.96*sd(magVScomp$dataMagComp$percDiff),3)),
                                   showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
-        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$percDiff) - 1.96*sd(magVScomp$dataMagComp$percDiff) - 10,
+        layout(annotations = list(x=1400, y=mean(magVScomp$dataMagComp$percDiff) - 1.96*sd(magVScomp$dataMagComp$percDiff) - 10,
                                   text=paste("Mean-1.96SD = ",signif(mean(magVScomp$dataMagComp$percDiff)-1.96*sd(magVScomp$dataMagComp$percDiff),3)),
                                   showarrow = FALSE, font = list(size=12, color="firebrick")))
     }
@@ -109,29 +109,29 @@ function(input, output) {
                                 '<br> ID: ', sid)) %>%
         layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), zeroline=F, 
                             showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
-                            range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100)),
+                            range=list(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+600)),
                yaxis = list(title=list(text="Difference (ms)", font=list(size=18)), tickfont=list(size=15),
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                             range=list(unname(apply(magVScomp$dataMagComp,2,min))[4]-20,unname(apply(magVScomp$dataMagComp,2,max))[4]+20)),
-               legend = list(title=list(text="<b>Site ID</b>"))) %>%
-        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100), y = mean(magVScomp$dataMagComp$diff),
+               legend = list(title=list(text="<b>Site ID</b>"), x=0.85, y=0.95, bgcolor = "rgba(0,0,0,0)")) %>%
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+600), y = mean(magVScomp$dataMagComp$diff),
                   type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
                   showlegend = FALSE, hoverinfo = "none") %>%
-        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+600),
                   y = mean(magVScomp$dataMagComp$diff) + 1.96*sd(magVScomp$dataMagComp$diff),
                   type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
                   showlegend = FALSE, hoverinfo = "none") %>%
-        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+100),
+        add_trace(x = c(0,unname(apply(magVScomp$dataMagComp,2,max))[8]+600),
                   y = mean(magVScomp$dataMagComp$diff) - 1.96*sd(magVScomp$dataMagComp$diff),
                   type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
                   showlegend = FALSE, hoverinfo = "none") %>%
-        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$diff)-10,
+        layout(annotations = list(x=1400, y=mean(magVScomp$dataMagComp$diff)-10,
                                   text=paste("Mean = ",signif(mean(magVScomp$dataMagComp$diff),3)),
                                   showarrow = FALSE, font = list(size=12, color="black"))) %>%
-        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$diff) + 1.96*sd(magVScomp$dataMagComp$diff) + 10,
+        layout(annotations = list(x=1400, y=mean(magVScomp$dataMagComp$diff) + 1.96*sd(magVScomp$dataMagComp$diff) + 10,
                                   text=paste("Mean+1.96SD = ",signif(mean(magVScomp$dataMagComp$diff)+1.96*sd(magVScomp$dataMagComp$diff),3)),
                                   showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
-        layout(annotations = list(x=1700, y=mean(magVScomp$dataMagComp$diff) - 1.96*sd(magVScomp$dataMagComp$diff) - 10,
+        layout(annotations = list(x=1400, y=mean(magVScomp$dataMagComp$diff) - 1.96*sd(magVScomp$dataMagComp$diff) - 10,
                                   text=paste("Mean-1.96SD = ",signif(mean(magVScomp$dataMagComp$diff)-1.96*sd(magVScomp$dataMagComp$diff),3)),
                                   showarrow = FALSE, font = list(size=12, color="firebrick")))
     }
@@ -154,9 +154,10 @@ function(input, output) {
              yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,unname(apply(magVScomp$dataCorr,2,max))[4]+100)),
-             legend = list(title=list(text="<b>Reference T1 (ms)</b>"))) %>%
+             legend = list(title=list(text="<b>T1 (ms)</b>", font=list(size = 10)),
+                           font = list(size = 9), yanchor="top", xanchor="left", x=0.01, y=0.99, bgcolor = "rgba(0,0,0,0)")) %>%
       add_trace(x = c(0, unname(apply(magVScomp$dataCorr,2,max))[5]+100), y = c(0, unname(apply(magVScomp$dataCorr,2,max))[4]+100),
-                type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
+                type = "scatter", mode = "lines", line = list(color = 'black', width = 2), showlegend = FALSE)
   })
   
   output$PearsonCorr <- renderTable(magVScomp$PearsonCorr)
@@ -177,9 +178,10 @@ function(input, output) {
              yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,unname(apply(magVScomp$PearsonCorrSphere,2,max))[4]+100)),
-             legend = list(title=list(text="<b>Reference T1 (ms)</b>"))) %>%
+             legend = list(title=list(text="<b>T1 (ms)</b>", font=list(size = 10)),
+                           font = list(size = 9), yanchor="top", xanchor="left", x=0.01, y=0.99, bgcolor = "rgba(0,0,0,0)")) %>%
       add_trace(x = c(0, unname(apply(magVScomp$PearsonCorrSphere,2,max))[5]+100), y = c(0, unname(apply(magVScomp$PearsonCorrSphere,2,max))[4]+100),
-                type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
+                type = "scatter", mode = "lines", line = list(color = 'black', width = 2), showlegend = FALSE)
   })
   
   toListen <- reactive({input$CorrSitesIDallDP})
@@ -215,9 +217,10 @@ function(input, output) {
              yaxis = list(title=list(text="Magnitude T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,unname(apply(magVScomp$PearsonCorrSphere,2,max))[4]+100)),
-             legend = list(title=list(text="<b>Reference T1 (ms)</b>"))) %>%
+             legend = list(title=list(text="<b>T1 (ms)</b>", font=list(size = 10)),
+                           font = list(size = 9), yanchor="bottom", xanchor="right", x=0.99, y=0.01, bgcolor = "rgba(0,0,0,0)")) %>%
       add_trace(x = c(0, unname(apply(magVScomp$PearsonCorrSphere,2,max))[5]+100), y = c(0, unname(apply(magVScomp$PearsonCorrSphere,2,max))[4]+100),
-                type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
+                type = "scatter", mode = "lines", line = list(color = 'black', width = 2), showlegend = FALSE)
   })
   
   spheres = 1:14
@@ -252,7 +255,8 @@ function(input, output) {
              yaxis = list(title=list(text="Mean T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(MeasSites$dataSite,2,max))[5])+100)),
-             legend = list(title=list(text="<b>Site ID</b>")))
+             legend = list(title=list(text="<b>Site ID</b>", font=list(size = 10)),
+                           font = list(size = 9), xanchor="left", yanchor="top", x=0.01, y=0.8, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$sdFilteredSites <- renderPlotly({
@@ -269,7 +273,8 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
              yaxis = list(title=list(text="SD/Reference T1", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,0.2)),
-             legend = list(title=list(text="<b>Site ID</b>")))
+             legend = list(title=list(text="<b>Site ID</b>", font=list(size = 10)),
+                           font = list(size = 9), xanchor="right", yanchor="top", x=0.99, y=0.8, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$DispAllPoints <- renderPlotly({
@@ -303,10 +308,11 @@ function(input, output) {
              yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[5])+100)),
-             legend = list(title=list(text="</b>Site ID</b>"))) %>%
+             legend = list(title=list(text="<b>Site ID</b>", font=list(size = 10)),
+                           font = list(size = 9), x=0.75, y=0.01, bgcolor = "rgba(0,0,0,0)")) %>%
       add_trace(x = c(0, as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[4])+100),
                 y = c(0, as.numeric(unname(apply(DispersionAllPoints$dataSite_long,2,max))[5])+100),
-                type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
+                type = "scatter", mode = "lines", line = list(color = 'black', width = 2), showlegend = FALSE)
   })
   
   output$Disp4Site <- renderPlotly({
@@ -340,9 +346,10 @@ function(input, output) {
              yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100)),
-             legend = list(title=list(text="<b>Site ID</b>"))) %>%
+             legend = list(title=list(text="<b>Site ID</b>", font=list(size = 10)),
+                           font = list(size = 9), x=0.75, y=0.01, bgcolor = "rgba(0,0,0,0)")) %>%
       add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100), y = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100),
-                type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
+                type = "scatter", mode = "lines", line = list(color = 'black', width = 2), showlegend = FALSE)
   })
   
   output$BA4Site <- renderPlotly({
@@ -373,29 +380,29 @@ function(input, output) {
                               '<br> Sphere: ', sph)) %>%
       layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), 
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
-                          range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100)),
+                          range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+800)),
              yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(-40,40)),
-             legend = list(title=list(text="<b>Site ID</b>"))) %>%
-      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100), y = mean(RefVSMeas$BAData$perc_difference),
+             legend = list(title=list(text="<b>Site ID</b>"), x=0.75, y=0.95, bgcolor = "rgba(0,0,0,0)")) %>%
+      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+800), y = mean(RefVSMeas$BAData$perc_difference),
                 type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
                 showlegend = FALSE, hoverinfo = "none") %>%
-      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100),
+      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+800),
                 y = mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference),
                 type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
                 showlegend = FALSE, hoverinfo = "none") %>%
-      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100),
+      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+800),
                 y = mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference),
                 type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
                 showlegend = FALSE, hoverinfo = "none") %>%
-      layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference)-3,
+      layout(annotations = list(x=1500, y=mean(RefVSMeas$BAData$perc_difference)-3,
                                 text=paste("Mean = ",signif(mean(RefVSMeas$BAData$perc_difference),3)),
                                 showarrow = FALSE, font = list(size=12, color="black"))) %>%
-      layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference) + 5,
+      layout(annotations = list(x=1500, y=mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference) + 5,
                                 text=paste("Mean+1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)+1.96*sd(RefVSMeas$BAData$perc_difference),3)),
                                 showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
-      layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference) - 5,
+      layout(annotations = list(x=1500, y=mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference) - 5,
                                 text=paste("Mean-1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)-1.96*sd(RefVSMeas$BAData$perc_difference),3)),
                                 showarrow = FALSE, font = list(size=12, color="firebrick")))
   })
@@ -425,9 +432,10 @@ function(input, output) {
              yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100)),
-             legend = list(title=list(text="<b>MRI vendor</b>"))) %>%
+             legend = list(title=list(text="<b>MRI vendor</b>", font=list(size = 10)),
+                           font = list(size = 9), x=0.67, y=0.01, bgcolor = "rgba(0,0,0,0)")) %>%
       add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[6])+100), y = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[5])+100),
-                type = "scatter", mode = "lines", line = list(color = 'blue', width = 2), showlegend = FALSE)
+                type = "scatter", mode = "lines", line = list(color = 'black', width = 2), showlegend = FALSE)
   })
   
   output$BA4Vendor <- renderPlotly({
@@ -452,28 +460,28 @@ function(input, output) {
                               '<br> Sphere: ', sph)) %>%
       layout(xaxis = list(title=list(text="Average T1 (ms)", font=list(size=18)), tickfont=list(size=15), 
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
-                          range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100)),
+                          range=list(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+800)),
              yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(-40,40)),
-             legend = list(title=list(text="<b>MRI vendor</b>"))) %>%
-      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100), y = mean(RefVSMeas$BAData$perc_difference),
+             legend = list(title=list(text="<b>MRI vendor</b>"), x=0.72, y=0.95, bgcolor = "rgba(0,0,0,0)")) %>%
+      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+800), y = mean(RefVSMeas$BAData$perc_difference),
                 type='scatter', mode = "lines", line = list(dash = "solid", width = 2, color = "black"),
                 showlegend = FALSE, hoverinfo = "none") %>%
-      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100),
+      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+800),
                 y = mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference),
                 type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
                 showlegend = FALSE, hoverinfo = "none") %>%
-      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+100),
+      add_trace(x = c(0,as.numeric(unname(apply(RefVSMeas$BAData,2,max))[9])+800),
                 y = mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference),
                 type='scatter', mode = "lines", line = list(dash = "dash", color = "firebrick"),
                 showlegend = FALSE, hoverinfo = "none") %>%
-      layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference)-3,
+      layout(annotations = list(x=1500, y=mean(RefVSMeas$BAData$perc_difference)-3,
                                 text=paste("Mean = ",signif(mean(RefVSMeas$BAData$perc_difference),3)),
                                 showarrow = FALSE, font = list(size=12, color="black"))) %>%
-      layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference) + 5,
+      layout(annotations = list(x=1500, y=mean(RefVSMeas$BAData$perc_difference) + 1.96*sd(RefVSMeas$BAData$perc_difference) + 5,
                                 text=paste("Mean+1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)+1.96*sd(RefVSMeas$BAData$perc_difference),3)),
                                 showarrow = FALSE, font = list(size=12, color="firebrick"))) %>%
-      layout(annotations = list(x=1700, y=mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference) - 5,
+      layout(annotations = list(x=1500, y=mean(RefVSMeas$BAData$perc_difference) - 1.96*sd(RefVSMeas$BAData$perc_difference) - 5,
                                 text=paste("Mean-1.96SD = ",signif(mean(RefVSMeas$BAData$perc_difference)-1.96*sd(RefVSMeas$BAData$perc_difference),3)),
                                 showarrow = FALSE, font = list(size=12, color="firebrick")))
   })
@@ -510,7 +518,8 @@ function(input, output) {
                           range=list(0,as.numeric(unname(apply(AcErrorAllPoints,2,max))[4])+100)),
              yaxis = list(title=list(text="Accuracy Error (%)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,60)),
-             legend = list(title=list(text="<bSite ID</b>")))
+             legend = list(title=list(text="<b>Site ID</b>", font=list(size = 10)),
+                           font = list(size = 9), x=0.75, y=0.99, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$HSF1 <- renderPlotly({HSFData$diffBootstrapDiff[[14]]})
@@ -544,7 +553,8 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
-             legend = list(title=list(text="<b>ROI</b>")))
+             legend = list(title=list(text="<b>ROI</b>"), orientation="h", xanchor="center", 
+                           x=0.5, y=0.95, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$humanMEX_all <- renderPlotly({
@@ -560,7 +570,8 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
-             legend = list(title=list(text="<b>ROI</b>")))
+             legend = list(title=list(text="<b>ROI</b>"), orientation="h", xanchor="center", 
+                           x=0.5, y=0.95, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$humanCAN_all <- renderPlotly({
@@ -576,7 +587,8 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
-             legend = list(title=list(text="<b>ROI</b>")))
+             legend = list(title=list(text="<b>ROI</b>"), orientation="h", xanchor="center", 
+                           x=0.5, y=0.95, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$humanUS_all <- renderPlotly({
@@ -594,7 +606,8 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
-             legend = list(title=list(text="<b>ROI</b>")))
+             legend = list(title=list(text="<b>ROI</b>"), orientation="h", xanchor="center", 
+                           x=0.5, y=0.95, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$humanITA_all <- renderPlotly({
@@ -610,7 +623,8 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
-             legend = list(title=list(text="<b>ROI</b>")))
+             legend = list(title=list(text="<b>ROI</b>"), orientation="h", xanchor="center", 
+                           x=0.5, y=0.95, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$humanGER_all <- renderPlotly({
@@ -626,7 +640,8 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
-             legend = list(title=list(text="<b>ROI</b>")))
+             legend = list(title=list(text="<b>ROI</b>"), orientation="h", xanchor="center", 
+                           x=0.5, y=0.95, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$humanAUS_all <- renderPlotly({
@@ -642,7 +657,8 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
-             legend = list(title=list(text="<b>ROI</b>")))
+             legend = list(title=list(text="<b>ROI</b>"), orientation="h", xanchor="center", 
+                           x=0.5, y=0.95, bgcolor = "rgba(0,0,0,0)"))
   })
   
   output$humanMEX_vendor <- renderPlotly({
@@ -665,7 +681,7 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(as.numeric(unname(apply(sitesHuman_Mexico$dataLong_human,2,min))[6])-100,
                                      as.numeric(unname(apply(sitesHuman_Mexico$dataLong_human,2,max))[6])+100)),
-             legend = list(title=list(text="<b>ROI</b>")))
+             legend = list(title=list(text="<b>ROI</b>"), x=0.75, y=0.95, bgcolor = "rgba(0,0,0,0)"))
   })
   
   sitesHuman_colors <- setNames(rainbow(length(listHumanData)), unique(dfmeanHuman$Site))
@@ -681,7 +697,7 @@ function(input, output) {
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F),
              yaxis = list(title=list(text="Percentage difference (%)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(-30,70)),
-             legend = list(title=list(text="<b>Site ID</b>")))
+             legend = list(title=list(text="<b>Site ID</b>"), x=0.8, y=0.95, bgcolor = "rgba(0,0,0,0)"))
   })
   
   sitesHuman$dataLong_human$age_long=as.numeric(as.character(sitesHuman$dataLong_human$age_long))
@@ -698,7 +714,7 @@ function(input, output) {
              yaxis = list(title=list(text="Measured T1 value (ms)", font=list(size=18)), tickfont=list(size=15),
                           zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F,
                           range=list(0,as.numeric(unname(apply(sitesHuman$dataLong_human,2,max))[6])+100)),
-             legend = list(title=list(text="<b>ROI</b>")))
+             legend = list(title=list(text="<b>ROI</b>"), x=0.75, y=0.95, bgcolor = "rgba(0,0,0,0)"))
     
   })
   
@@ -723,7 +739,7 @@ function(input, output) {
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxX+100)),
                yaxis = list(title=list(text="Coefficient of variation (%)", font=list(size=18)), tickfont=list(size=15), 
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,300)),
-               legend = list(title=list(text="<b>Site ID</b>")))
+               legend = list(title=list(text="<b>Site ID</b>"), x=0.6, y=0.95, bgcolor = "rgba(0,0,0,0)"))
     }
     else if (input$cov_std == "Standard deviation"){
       plot_ly(compNISTHuman_nist$data_NIST) %>%
@@ -740,7 +756,7 @@ function(input, output) {
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxX+100)),
                yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15), 
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxY+100)),
-               legend = list(title=list(text="<b>Site ID</b>")))
+               legend = list(title=list(text="<b>Site ID</b>"), x=0.6, y=0.95, bgcolor = "rgba(0,0,0,0)"))
     }
   })
   
@@ -760,7 +776,7 @@ function(input, output) {
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxX+100)),
                yaxis = list(title=list(text="Coefficient of variation (%)", font=list(size=18)), tickfont=list(size=15), 
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,300)),
-               legend = list(title=list(text="<b>Site ID</b>")))
+               legend = list(title=list(text="<b>Site ID</b>"), x=0.6, y=0.95, bgcolor = "rgba(0,0,0,0)"))
     }
     else if (input$cov_std == "Standard deviation"){
       plot_ly(compNISTHuman_human$data_human) %>%
@@ -777,7 +793,7 @@ function(input, output) {
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxX+100)),
                yaxis = list(title=list(text="Standard deviation (ms)", font=list(size=18)), tickfont=list(size=15),
                             zeroline=F, showline=T, linewidth=2, linecolor="black", mirror=T, showgrid=F, range=list(0,maxY+100)),
-               legend = list(title=list(text="<b>Site ID</b>")))
+               legend = list(title=list(text="<b>Site ID</b>"), x=0.6, y=0.95, bgcolor = "rgba(0,0,0,0)"))
     }
   })
 }
