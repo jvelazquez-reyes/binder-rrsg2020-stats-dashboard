@@ -13,7 +13,7 @@ hierarchical_shift_function <- function(dataSites){
     np = length(uniqueSites) # Number of submissions of interest
     qseq <- seq(0.1,0.9,0.1) # quantiles
     alpha <- 0.05
-    nboot <- 150 # bootstrap
+    nboot <- 1000 # bootstrap
     tr <- 0.2 # group trimmed mean for each quantile
     nq <- length(qseq) #quantile length
     

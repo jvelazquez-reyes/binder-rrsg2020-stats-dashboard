@@ -113,7 +113,11 @@ sdGermany <- measuredT1_against_referenceT1(Germany)
 source("hierarchical_shift_function.R")
 
 dataSites <- MeasSites$dataSite_long
-HSFData <- hierarchical_shift_function(dataSites)
+if(!exists("HSFData")){
+  HSFData <- hierarchical_shift_function(dataSites)
+} else {
+  load("./res/HSF.RData")
+}
 
 ##HUMAN DATASET##
 data2 <- read.csv("3T_human_T1maps_database.csv")
